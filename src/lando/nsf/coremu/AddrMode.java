@@ -1,0 +1,18 @@
+package lando.nsf.coremu;
+
+
+public enum AddrMode {
+	IMMEDIATE,
+	ZERO_PAGE,
+	ZERO_PAGE_X,
+	ZERO_PAGE_Y,
+	ABSOLUTE,
+	ABSOLUTE_X,
+	ABSOLUTE_Y,
+	INDIRECT_X,
+	INDIRECT_Y, 
+	ACCUMULATOR, 
+	RELATIVE, 
+	IMPLIED, 
+	INDIRECT
+}
