@@ -1,5 +1,5 @@
-/.settings
-/target
-/bin
+/bin/
+/target/
+.DS_Store
 *.swp
 *~

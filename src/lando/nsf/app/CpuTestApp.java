@@ -16,12 +16,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
 import lando.nsf.*;
-import lando.nsf.coremu.CPU;
-import lando.nsf.coremu.DisassemblerUtils;
-import lando.nsf.coremu.HexUtils;
-import lando.nsf.coremu.MEM;
-import lando.nsf.coremu.OpCode;
-import lando.nsf.coremu.OpCodes;
+import lando.nsf.core6502.CPU;
+import lando.nsf.core6502.DisassemblerUtils;
+import lando.nsf.core6502.HexUtils;
+import lando.nsf.core6502.Instruction;
+import lando.nsf.core6502.Instructions;
+import lando.nsf.core6502.MEM;
 
 import org.apache.commons.lang3.Validate;
 
@@ -460,10 +460,10 @@ public final class CpuTestApp {
 			int b2 = mem.read(cpu.PC + 1);
 			int b3 = mem.read(cpu.PC + 2);
 			
-			OpCode opInfo = null;
+			Instruction opInfo = null;
 			
-			if( b1 >= 0 && b1 < OpCodes.OP_CODES.length) {
-				opInfo = OpCodes.OP_CODES[b1];
+			if( b1 >= 0 && b1 < Instructions.BY_OP_CODE.length) {
+				opInfo = Instructions.BY_OP_CODE[b1];
 			}
 			
 			int len;

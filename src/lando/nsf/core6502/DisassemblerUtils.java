@@ -1,14 +1,14 @@
-package lando.nsf.coremu;
+package lando.nsf.core6502;
 
 public final class DisassemblerUtils {
 
 	public static String opCodeText(int b1, int b2, int b3) {
 		
-		if( b1 < 0 || b1 >= OpCodes.OP_CODES.length) {
+		if( b1 < 0 || b1 >= Instructions.BY_OP_CODE.length) {
 			return "???";
 		}
 		
-		OpCode opInfo = OpCodes.OP_CODES[b1];
+		Instruction opInfo = Instructions.BY_OP_CODE[b1];
 		
 		if( opInfo == null ) {
 			return "???";

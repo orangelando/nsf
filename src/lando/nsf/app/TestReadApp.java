@@ -1,15 +1,15 @@
 package lando.nsf.app;
 
-import static lando.nsf.coremu.HexUtils.*;
+import static lando.nsf.core6502.HexUtils.*;
 
 import java.io.File;
 import java.util.Arrays;
 
 import lando.nsf.*;
-import lando.nsf.coremu.CPU;
-import lando.nsf.coremu.MEM;
-import lando.nsf.coremu.OpCode;
-import lando.nsf.coremu.OpCodes;
+import lando.nsf.core6502.CPU;
+import lando.nsf.core6502.Instruction;
+import lando.nsf.core6502.Instructions;
+import lando.nsf.core6502.MEM;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.Validate;
@@ -101,7 +101,7 @@ public class TestReadApp {
 			
 			int b = cpuMem[pc] & 0xFF;
 			
-			OpCode op = OpCodes.OP_CODES[b];
+			Instruction op = Instructions.BY_OP_CODE[b];
 			
 			if( op != null ) {
 			

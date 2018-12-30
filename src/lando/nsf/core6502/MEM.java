@@ -1,4 +1,4 @@
-package lando.nsf.coremu;
+package lando.nsf.core6502;
 
 public final class MEM {
 	

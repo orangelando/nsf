@@ -1,7 +1,7 @@
 package lando.nsf.app;
 
-import lando.nsf.coremu.HexUtils;
-import lando.nsf.coremu.MEM;
+import lando.nsf.core6502.HexUtils;
+import lando.nsf.core6502.MEM;
 
 public final class MemMirrorTestApp {
 

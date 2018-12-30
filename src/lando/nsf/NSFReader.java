@@ -1,6 +1,6 @@
 package lando.nsf;
 
-import static lando.nsf.coremu.HexUtils.toHex16;
+import static lando.nsf.core6502.HexUtils.toHex16;
 
 import java.io.File;
 
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import lando.nsf.coremu.MEM;
+import lando.nsf.core6502.MEM;
 
 public final class NSFReader {
 
