@@ -1,6 +1,8 @@
-package lando.nsf.core6502;
+package lando.nsf;
 
-public final class MEM {
+import lando.nsf.core6502.Memory;
+
+public final class NESMem implements Memory {
 	
 	public static final int NUM_ACCESSES = 4096;
 	
@@ -12,7 +14,7 @@ public final class MEM {
 	public int writes = 0;
 	public APU apu = null;
 	
-	public MEM() {
+	public NESMem() {
 	}
 
 	public int read(int addr) {

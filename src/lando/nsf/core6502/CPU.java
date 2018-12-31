@@ -1,7 +1,5 @@
 package lando.nsf.core6502;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang3.Validate;
 
 public final class CPU {
@@ -15,7 +13,7 @@ public final class CPU {
 	public static final int STATUS_N = 0x80;
 	public static final int STACK_START = 0x0100;
 	
-	public final MEM mem;
+	private final Memory mem;
 	
 	public int P  = 0;
 	public int PC = 0;
@@ -26,26 +24,9 @@ public final class CPU {
 	
 	public int cycles = 0;
 	
-	public CPU(MEM mem) {
+	public CPU(Memory mem) {
 		Validate.notNull(mem);
 		this.mem = mem;
-		initPowerUpState();
-	}
-	
-	public void initPowerUpState() {
-		//from http://wiki.nesdev.com/w/index.php/CPU_power_up_state
-		P = 0; //0x34;
-		A = 0;
-		X = 0;
-		Y = 0;
-		S = 0xFD;
-		
-		Arrays.fill(mem.bytes, 0x0000, 0x0800, (byte)0xFF);
-		
-		mem.bytes[0x0008] = (byte)0xF7;
-		mem.bytes[0x0009] = (byte)0xEF;
-		mem.bytes[0x000A] = (byte)0xDF;
-		mem.bytes[0x000F] = (byte)0xBF;
 	}
 	
 	public int step() {

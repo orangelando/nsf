@@ -71,7 +71,6 @@ import static lando.nsf.core6502.OpCodeName.TXS;
 import static lando.nsf.core6502.OpCodeName.TYA;
 
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,240 +87,223 @@ import org.apache.commons.lang3.Validate;
  */
 public final class Instructions {
 
-	public static Instruction[] BY_OP_CODE = 
-	        new Instruction[256];
-	
-	public static Map<OpCodeName, Map<AddrMode, Instruction>> BY_NAME_AND_ADDR_MODE = 
-	        new EnumMap<>(OpCodeName.class);
+	public static Instruction[] BY_OP_CODE;
+	public static Map<OpCodeName, Map<AddrMode, Instruction>> BY_NAME_AND_ADDR_MODE;
 		
 	public static List<Instruction> ALL_INSTRS = Arrays.asList(
 	        
-	        new Instruction(0x69, ADC, 2, 2, IMMEDIATE),
-	        new Instruction(0x65, ADC, 2, 3, ZERO_PAGE),
-	        new Instruction(0x75, ADC, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0x6D, ADC, 3, 4, ABSOLUTE),
-	        new Instruction(0x7D, ADC, 3, 4, ABSOLUTE_X),
-	        new Instruction(0x79, ADC, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0x61, ADC, 2, 6, INDIRECT_X),
-	        new Instruction(0x71, ADC, 2, 5, INDIRECT_Y),
+	        new Instruction(0x69, ADC, 2, IMMEDIATE),
+	        new Instruction(0x65, ADC, 3, ZERO_PAGE),
+	        new Instruction(0x75, ADC, 4, ZERO_PAGE_X),
+	        new Instruction(0x6D, ADC, 4, ABSOLUTE),
+	        new Instruction(0x7D, ADC, 4, ABSOLUTE_X),
+	        new Instruction(0x79, ADC, 4, ABSOLUTE_Y),
+	        new Instruction(0x61, ADC, 6, INDIRECT_X),
+	        new Instruction(0x71, ADC, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0x29, AND, 2, 2, IMMEDIATE),
-	        new Instruction(0x25, AND, 2, 2, ZERO_PAGE),
-	        new Instruction(0x35, AND, 2, 3, ZERO_PAGE_X),
-	        new Instruction(0x2D, AND, 3, 4, ABSOLUTE),
-	        new Instruction(0x3D, AND, 3, 4, ABSOLUTE_X),
-	        new Instruction(0x39, AND, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0x21, AND, 2, 6, INDIRECT_X),
-	        new Instruction(0x31, AND, 2, 5, INDIRECT_Y),
+	        new Instruction(0x29, AND, 2, IMMEDIATE),
+	        new Instruction(0x25, AND, 3, ZERO_PAGE),
+	        new Instruction(0x35, AND, 4, ZERO_PAGE_X),
+	        new Instruction(0x2D, AND, 4, ABSOLUTE),
+	        new Instruction(0x3D, AND, 4, ABSOLUTE_X),
+	        new Instruction(0x39, AND, 4, ABSOLUTE_Y),
+	        new Instruction(0x21, AND, 6, INDIRECT_X),
+	        new Instruction(0x31, AND, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0x0A, ASL, 1, 2, ACCUMULATOR),
-	        new Instruction(0x06, ASL, 2, 5, ZERO_PAGE),
-	        new Instruction(0x16, ASL, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0x0E, ASL, 3, 6, ABSOLUTE),
-	        new Instruction(0x1E, ASL, 3, 7, ABSOLUTE_X),
+	        new Instruction(0x0A, ASL, 2, ACCUMULATOR),
+	        new Instruction(0x06, ASL, 5, ZERO_PAGE),
+	        new Instruction(0x16, ASL, 6, ZERO_PAGE_X),
+	        new Instruction(0x0E, ASL, 6, ABSOLUTE),
+	        new Instruction(0x1E, ASL, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0x90, BCC, 2, 2, RELATIVE),
+	        new Instruction(0x90, BCC, 2, RELATIVE),
 	                       
-	        new Instruction(0xB0, BCS, 2, 2, RELATIVE),
+	        new Instruction(0xB0, BCS, 2, RELATIVE),
 	                       
-	        new Instruction(0xF0, BEQ, 2, 2, RELATIVE),
+	        new Instruction(0xF0, BEQ, 2, RELATIVE),
 	                       
-	        new Instruction(0x24, BIT, 2, 3, ZERO_PAGE),
-	        new Instruction(0x2C, BIT, 3, 4, ABSOLUTE),
+	        new Instruction(0x24, BIT, 3, ZERO_PAGE),
+	        new Instruction(0x2C, BIT, 4, ABSOLUTE),
 	                       
-	        new Instruction(0x30, BMI, 2, 2, RELATIVE),
+	        new Instruction(0x30, BMI, 2, RELATIVE),
 	                       
-	        new Instruction(0xD0, BNE, 2, 2, RELATIVE),
+	        new Instruction(0xD0, BNE, 2, RELATIVE),
 	                       
-	        new Instruction(0x10, BPL, 2, 2, RELATIVE),
+	        new Instruction(0x10, BPL, 2, RELATIVE),
 	                       
-	        new Instruction(0x00, BRK, 1, 7, IMPLIED),
+	        new Instruction(0x00, BRK, 7, IMPLIED),
 	                       
-	        new Instruction(0x50, BVC, 2, 2, RELATIVE),
+	        new Instruction(0x50, BVC, 2, RELATIVE),
 	                       
-	        new Instruction(0x70, BVS, 2, 2, RELATIVE),
+	        new Instruction(0x70, BVS, 2, RELATIVE),
 	                       
-	        new Instruction(0x18, CLC, 1, 2, IMPLIED),
+	        new Instruction(0x18, CLC, 2, IMPLIED),
 	                       
-	        new Instruction(0xD8, CLD, 1, 2, IMPLIED),
+	        new Instruction(0xD8, CLD, 2, IMPLIED),
 	                       
-	        new Instruction(0x58, CLI, 1, 2, IMPLIED),
+	        new Instruction(0x58, CLI, 2, IMPLIED),
 	                       
-	        new Instruction(0xB8, CLV, 1, 2, IMPLIED),
+	        new Instruction(0xB8, CLV, 2, IMPLIED),
 	                       
-	        new Instruction(0xC9, CMP, 2, 2, IMMEDIATE),
-	        new Instruction(0xC5, CMP, 2, 3, ZERO_PAGE),
-	        new Instruction(0xD5, CMP, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0xCD, CMP, 3, 4, ABSOLUTE),
-	        new Instruction(0xDD, CMP, 3, 4, ABSOLUTE_X),
-	        new Instruction(0xD9, CMP, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0xC1, CMP, 2, 6, INDIRECT_X),
-	        new Instruction(0xD1, CMP, 2, 5, INDIRECT_Y),
+	        new Instruction(0xC9, CMP, 2, IMMEDIATE),
+	        new Instruction(0xC5, CMP, 3, ZERO_PAGE),
+	        new Instruction(0xD5, CMP, 4, ZERO_PAGE_X),
+	        new Instruction(0xCD, CMP, 4, ABSOLUTE),
+	        new Instruction(0xDD, CMP, 4, ABSOLUTE_X),
+	        new Instruction(0xD9, CMP, 4, ABSOLUTE_Y),
+	        new Instruction(0xC1, CMP, 6, INDIRECT_X),
+	        new Instruction(0xD1, CMP, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0xE0, CPX, 2, 2, IMMEDIATE),
-	        new Instruction(0xE4, CPX, 2, 3, ZERO_PAGE),
-	        new Instruction(0xEC, CPX, 3, 4, ABSOLUTE),
+	        new Instruction(0xE0, CPX, 2, IMMEDIATE),
+	        new Instruction(0xE4, CPX, 3, ZERO_PAGE),
+	        new Instruction(0xEC, CPX, 4, ABSOLUTE),
 	                       
-	        new Instruction(0xC0, CPY, 2, 2, IMMEDIATE),
-	        new Instruction(0xC4, CPY, 2, 3, ZERO_PAGE),
-	        new Instruction(0xCC, CPY, 3, 4, ABSOLUTE),
+	        new Instruction(0xC0, CPY, 2, IMMEDIATE),
+	        new Instruction(0xC4, CPY, 3, ZERO_PAGE),
+	        new Instruction(0xCC, CPY, 4, ABSOLUTE),
 	                       
-	        new Instruction(0xC6, DEC, 2, 5, ZERO_PAGE),
-	        new Instruction(0xD6, DEC, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0xCE, DEC, 3, 6, ABSOLUTE),
-	        new Instruction(0xDE, DEC, 3, 7, ABSOLUTE_X),
+	        new Instruction(0xC6, DEC, 5, ZERO_PAGE),
+	        new Instruction(0xD6, DEC, 6, ZERO_PAGE_X),
+	        new Instruction(0xCE, DEC, 6, ABSOLUTE),
+	        new Instruction(0xDE, DEC, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0xCA, DEX, 1, 2, IMPLIED),
+	        new Instruction(0xCA, DEX, 2, IMPLIED),
 	                       
-	        new Instruction(0x88, DEY, 1, 2, IMPLIED),
+	        new Instruction(0x88, DEY, 2, IMPLIED),
 	                       
-	        new Instruction(0x49, EOR, 2, 2, IMMEDIATE),
-	        new Instruction(0x45, EOR, 2, 3, ZERO_PAGE),
-	        new Instruction(0x55, EOR, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0x4D, EOR, 3, 4, ABSOLUTE),
-	        new Instruction(0x5D, EOR, 3, 4, ABSOLUTE_X),
-	        new Instruction(0x59, EOR, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0x41, EOR, 2, 6, INDIRECT_X),
-	        new Instruction(0x51, EOR, 2, 5, INDIRECT_Y),
+	        new Instruction(0x49, EOR, 2, IMMEDIATE),
+	        new Instruction(0x45, EOR, 3, ZERO_PAGE),
+	        new Instruction(0x55, EOR, 4, ZERO_PAGE_X),
+	        new Instruction(0x4D, EOR, 4, ABSOLUTE),
+	        new Instruction(0x5D, EOR, 4, ABSOLUTE_X),
+	        new Instruction(0x59, EOR, 4, ABSOLUTE_Y),
+	        new Instruction(0x41, EOR, 6, INDIRECT_X),
+	        new Instruction(0x51, EOR, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0xE6, INC, 2, 5, ZERO_PAGE),
-	        new Instruction(0xF6, INC, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0xEE, INC, 3, 6, ABSOLUTE),
-	        new Instruction(0xFE, INC, 3, 7, ABSOLUTE_X),
+	        new Instruction(0xE6, INC, 5, ZERO_PAGE),
+	        new Instruction(0xF6, INC, 6, ZERO_PAGE_X),
+	        new Instruction(0xEE, INC, 6, ABSOLUTE),
+	        new Instruction(0xFE, INC, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0xE8, INX, 1, 2, IMPLIED),
+	        new Instruction(0xE8, INX, 2, IMPLIED),
 	                       
-	        new Instruction(0xC8, INY, 1, 2, IMPLIED),
+	        new Instruction(0xC8, INY, 2, IMPLIED),
 	                       
-	        new Instruction(0x4C, JMP, 3, 3, ABSOLUTE),
-	        new Instruction(0x6C, JMP, 3, 5, INDIRECT),
+	        new Instruction(0x4C, JMP, 3, ABSOLUTE),
+	        new Instruction(0x6C, JMP, 5, INDIRECT),
 	                       
-	        new Instruction(0x20, JSR, 3, 6, ABSOLUTE),
+	        new Instruction(0x20, JSR, 6, ABSOLUTE),
 	                       
-	        new Instruction(0xA9, LDA, 2, 2, IMMEDIATE),
-	        new Instruction(0xA5, LDA, 2, 3, ZERO_PAGE),
-	        new Instruction(0xB5, LDA, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0xAD, LDA, 3, 4, ABSOLUTE),
-	        new Instruction(0xBD, LDA, 3, 4, ABSOLUTE_X),
-	        new Instruction(0xB9, LDA, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0xA1, LDA, 2, 6, INDIRECT_X),
-	        new Instruction(0xB1, LDA, 2, 5, INDIRECT_Y),
+	        new Instruction(0xA9, LDA, 2, IMMEDIATE),
+	        new Instruction(0xA5, LDA, 3, ZERO_PAGE),
+	        new Instruction(0xB5, LDA, 4, ZERO_PAGE_X),
+	        new Instruction(0xAD, LDA, 4, ABSOLUTE),
+	        new Instruction(0xBD, LDA, 4, ABSOLUTE_X),
+	        new Instruction(0xB9, LDA, 4, ABSOLUTE_Y),
+	        new Instruction(0xA1, LDA, 6, INDIRECT_X),
+	        new Instruction(0xB1, LDA, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0xA2, LDX, 2, 2, IMMEDIATE),
-	        new Instruction(0xA6, LDX, 2, 3, ZERO_PAGE),
-	        new Instruction(0xB6, LDX, 2, 4, ZERO_PAGE_Y),
-	        new Instruction(0xAE, LDX, 3, 4, ABSOLUTE),
-	        new Instruction(0xBE, LDX, 3, 4, ABSOLUTE_Y),
+	        new Instruction(0xA2, LDX, 2, IMMEDIATE),
+	        new Instruction(0xA6, LDX, 3, ZERO_PAGE),
+	        new Instruction(0xB6, LDX, 4, ZERO_PAGE_Y),
+	        new Instruction(0xAE, LDX, 4, ABSOLUTE),
+	        new Instruction(0xBE, LDX, 4, ABSOLUTE_Y),
 	                       
-	        new Instruction(0xA0, LDY, 2, 2, IMMEDIATE),
-	        new Instruction(0xA4, LDY, 2, 3, ZERO_PAGE),
-	        new Instruction(0xB4, LDY, 2, 4, ZERO_PAGE_Y),
-	        new Instruction(0xAC, LDY, 3, 4, ABSOLUTE),
-	        new Instruction(0xBC, LDY, 3, 4, ABSOLUTE_Y),
+	        new Instruction(0xA0, LDY, 2, IMMEDIATE),
+	        new Instruction(0xA4, LDY, 3, ZERO_PAGE),
+	        new Instruction(0xB4, LDY, 4, ZERO_PAGE_Y),
+	        new Instruction(0xAC, LDY, 4, ABSOLUTE),
+	        new Instruction(0xBC, LDY, 4, ABSOLUTE_Y),
 	                       
-	        new Instruction(0x4A, LSR, 1, 2, ACCUMULATOR),
-	        new Instruction(0x46, LSR, 2, 5, ZERO_PAGE),
-	        new Instruction(0x56, LSR, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0x4E, LSR, 3, 6, ABSOLUTE),
-	        new Instruction(0x5E, LSR, 3, 7, ABSOLUTE_X),
+	        new Instruction(0x4A, LSR, 2, ACCUMULATOR),
+	        new Instruction(0x46, LSR, 5, ZERO_PAGE),
+	        new Instruction(0x56, LSR, 6, ZERO_PAGE_X),
+	        new Instruction(0x4E, LSR, 6, ABSOLUTE),
+	        new Instruction(0x5E, LSR, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0xEA, NOP, 1, 2, IMPLIED),
+	        new Instruction(0xEA, NOP, 2, IMPLIED),
 	                       
-	        new Instruction(0x09, ORA, 2, 2, IMMEDIATE),
-	        new Instruction(0x05, ORA, 2, 3, ZERO_PAGE),
-	        new Instruction(0x15, ORA, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0x0D, ORA, 3, 4, ABSOLUTE),
-	        new Instruction(0x1D, ORA, 3, 4, ABSOLUTE_X),
-	        new Instruction(0x19, ORA, 3, 4, ABSOLUTE_Y),
-	        new Instruction(0x01, ORA, 2, 6, INDIRECT_X),
-	        new Instruction(0x11, ORA, 2, 5, INDIRECT_Y),
+	        new Instruction(0x09, ORA, 2, IMMEDIATE),
+	        new Instruction(0x05, ORA, 3, ZERO_PAGE),
+	        new Instruction(0x15, ORA, 4, ZERO_PAGE_X),
+	        new Instruction(0x0D, ORA, 4, ABSOLUTE),
+	        new Instruction(0x1D, ORA, 4, ABSOLUTE_X),
+	        new Instruction(0x19, ORA, 4, ABSOLUTE_Y),
+	        new Instruction(0x01, ORA, 6, INDIRECT_X),
+	        new Instruction(0x11, ORA, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0x48, PHA, 1, 3, IMPLIED),
+	        new Instruction(0x48, PHA, 3, IMPLIED),
 	                       
-	        new Instruction(0x08, PHP, 1, 3, IMPLIED),
+	        new Instruction(0x08, PHP, 3, IMPLIED),
 	                       
-	        new Instruction(0x68, PLA, 1, 4, IMPLIED),
+	        new Instruction(0x68, PLA, 4, IMPLIED),
 	                       
-	        new Instruction(0x28, PLP, 1, 4, IMPLIED),
+	        new Instruction(0x28, PLP, 4, IMPLIED),
 	                       
-	        new Instruction(0x2A, ROL, 1, 2, ACCUMULATOR),
-	        new Instruction(0x26, ROL, 2, 5, ZERO_PAGE),
-	        new Instruction(0x36, ROL, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0x2E, ROL, 3, 6, ABSOLUTE),
-	        new Instruction(0x3E, ROL, 3, 7, ABSOLUTE_X),
+	        new Instruction(0x2A, ROL, 2, ACCUMULATOR),
+	        new Instruction(0x26, ROL, 5, ZERO_PAGE),
+	        new Instruction(0x36, ROL, 6, ZERO_PAGE_X),
+	        new Instruction(0x2E, ROL, 6, ABSOLUTE),
+	        new Instruction(0x3E, ROL, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0x6A, ROR, 1, 2, ACCUMULATOR),
-	        new Instruction(0x66, ROR, 2, 5, ZERO_PAGE),
-	        new Instruction(0x76, ROR, 2, 6, ZERO_PAGE_X),
-	        new Instruction(0x6E, ROR, 3, 6, ABSOLUTE),
-	        new Instruction(0x7E, ROR, 3, 7, ABSOLUTE_X),
+	        new Instruction(0x6A, ROR, 2, ACCUMULATOR),
+	        new Instruction(0x66, ROR, 5, ZERO_PAGE),
+	        new Instruction(0x76, ROR, 6, ZERO_PAGE_X),
+	        new Instruction(0x6E, ROR, 6, ABSOLUTE),
+	        new Instruction(0x7E, ROR, 7, ABSOLUTE_X),
 	                       
-	        new Instruction(0x40, RTI, 1, 6, IMPLIED),
+	        new Instruction(0x40, RTI, 6, IMPLIED),
 	                       
-	        new Instruction(0x60, RTS, 1, 6, IMPLIED),
+	        new Instruction(0x60, RTS, 6, IMPLIED),
 	                       
-	        new Instruction(0xE9, SBC, 2, 2, IMMEDIATE),
-	        new Instruction(0xE5, SBC, 2, 2, ZERO_PAGE),
-	        new Instruction(0xF5, SBC, 2, 2, ZERO_PAGE_X),
-	        new Instruction(0xED, SBC, 3, 3, ABSOLUTE),
-	        new Instruction(0xFD, SBC, 3, 3, ABSOLUTE_X),
-	        new Instruction(0xF9, SBC, 3, 3, ABSOLUTE_Y),
-	        new Instruction(0xE1, SBC, 2, 2, INDIRECT_X),
-	        new Instruction(0xF1, SBC, 2, 2, INDIRECT_Y),
+	        new Instruction(0xE9, SBC, 2, IMMEDIATE),
+	        new Instruction(0xE5, SBC, 3, ZERO_PAGE),
+	        new Instruction(0xF5, SBC, 4, ZERO_PAGE_X),
+	        new Instruction(0xED, SBC, 4, ABSOLUTE),
+	        new Instruction(0xFD, SBC, 4, ABSOLUTE_X),
+	        new Instruction(0xF9, SBC, 4, ABSOLUTE_Y),
+	        new Instruction(0xE1, SBC, 6, INDIRECT_X),
+	        new Instruction(0xF1, SBC, 5, INDIRECT_Y),
 	                       
-	        new Instruction(0x38, SEC, 1, 2, IMPLIED),
+	        new Instruction(0x38, SEC, 2, IMPLIED),
 	                       
-	        new Instruction(0xF8, SED, 1, 2, IMPLIED),
+	        new Instruction(0xF8, SED, 2, IMPLIED),
 	                       
-	        new Instruction(0x78, SEI, 1, 2, IMPLIED),
+	        new Instruction(0x78, SEI, 2, IMPLIED),
 	                       
-	        new Instruction(0x85, STA, 2, 3, ZERO_PAGE),
-	        new Instruction(0x95, STA, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0x8D, STA, 3, 4, ABSOLUTE),
-	        new Instruction(0x9D, STA, 3, 5, ABSOLUTE_X),
-	        new Instruction(0x99, STA, 3, 5, ABSOLUTE_Y),
-	        new Instruction(0x81, STA, 2, 6, INDIRECT_X),
-	        new Instruction(0x91, STA, 2, 6, INDIRECT_Y),
+	        new Instruction(0x85, STA, 3, ZERO_PAGE),
+	        new Instruction(0x95, STA, 4, ZERO_PAGE_X),
+	        new Instruction(0x8D, STA, 4, ABSOLUTE),
+	        new Instruction(0x9D, STA, 5, ABSOLUTE_X),
+	        new Instruction(0x99, STA, 5, ABSOLUTE_Y),
+	        new Instruction(0x81, STA, 6, INDIRECT_X),
+	        new Instruction(0x91, STA, 6, INDIRECT_Y),
 	                       
-	        new Instruction(0x86, STX, 2, 3, ZERO_PAGE),
-	        new Instruction(0x96, STX, 2, 4, ZERO_PAGE_Y),
-	        new Instruction(0x8E, STX, 3, 4, ABSOLUTE),
+	        new Instruction(0x86, STX, 3, ZERO_PAGE),
+	        new Instruction(0x96, STX, 4, ZERO_PAGE_Y),
+	        new Instruction(0x8E, STX, 4, ABSOLUTE),
 	                       
-	        new Instruction(0x84, STY, 2, 3, ZERO_PAGE),
-	        new Instruction(0x94, STY, 2, 4, ZERO_PAGE_X),
-	        new Instruction(0x8C, STY, 3, 4, ABSOLUTE),
+	        new Instruction(0x84, STY, 3, ZERO_PAGE),
+	        new Instruction(0x94, STY, 4, ZERO_PAGE_X),
+	        new Instruction(0x8C, STY, 4, ABSOLUTE),
 	                       
-	        new Instruction(0xAA, TAX, 1, 2, IMPLIED),
-	        new Instruction(0xA8, TAY, 1, 2, IMPLIED),
+	        new Instruction(0xAA, TAX, 2, IMPLIED),
+	        new Instruction(0xA8, TAY, 2, IMPLIED),
 	                       
-	        new Instruction(0xBA, TSX, 1, 2, IMPLIED),
+	        new Instruction(0xBA, TSX, 2, IMPLIED),
 	                       
-	        new Instruction(0x8A, TXA, 1, 2, IMPLIED),
+	        new Instruction(0x8A, TXA, 2, IMPLIED),
 	                       
-	        new Instruction(0x9A, TXS, 1, 2, IMPLIED),
+	        new Instruction(0x9A, TXS, 2, IMPLIED),
 	                       
-	        new Instruction(0x98, TYA, 1, 2, IMPLIED)
+	        new Instruction(0x98, TYA, 2, IMPLIED)
 	        );
 	
 	static {
-	
-	    for(Instruction instr: ALL_INSTRS) {
-	        Validate.isTrue( BY_OP_CODE[instr.opCode] == null );
-	        
-	        BY_OP_CODE[instr.opCode] = instr;
-	        
-	        Map<AddrMode, Instruction> addrMap = BY_NAME_AND_ADDR_MODE.get(instr.name);
-	        
-	        if( addrMap == null ) {
-	            addrMap = new EnumMap<>(AddrMode.class);
-	            BY_NAME_AND_ADDR_MODE.put(instr.name, addrMap);
-	        }
-	        
-	        Validate.isTrue( ! addrMap.containsKey(instr.addrMode), 
-	                "Dupe entry for " + instr.name + ", " + instr.addrMode);
-	        
-	        addrMap.put(instr.addrMode, instr);
-	    }
+	    InstructionsMap map = new InstructionsMap();
+	    
+	    BY_OP_CODE = map.buildOpCodeArray(ALL_INSTRS);
+	    BY_NAME_AND_ADDR_MODE = map.buildNameMap(ALL_INSTRS);
     }
 	
 	public static Optional<Instruction> byOpCode(int code) {

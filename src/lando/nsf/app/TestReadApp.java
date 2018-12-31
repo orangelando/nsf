@@ -1,6 +1,6 @@
 package lando.nsf.app;
 
-import static lando.nsf.core6502.HexUtils.*;
+import static lando.nsf.HexUtils.*;
 
 import java.io.File;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import lando.nsf.*;
 import lando.nsf.core6502.CPU;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
-import lando.nsf.core6502.MEM;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.Validate;
@@ -26,7 +25,7 @@ public class TestReadApp {
 				//"/Users/oroman/Downloads/Metroid.nsf"
 				);
 		
-		MEM mem = new MEM();
+		NESMem mem = new NESMem();
 		CPU cpu = new CPU(mem);
 		NSF nsf = NSFReader.readNSF(file);
 		
@@ -63,11 +62,11 @@ public class TestReadApp {
 			}
 			
 			for(int i = 0x80; i < nsf.data.length; i++) {
-				cpu.mem.bytes[nsf.header.loadDataAddr + i - 0x80] = nsf.data[i];
+				mem.bytes[nsf.header.loadDataAddr + i - 0x80] = nsf.data[i];
 			}
 		}
 		
-		printDisassemble(cpu.mem.bytes, nsf.header.playDataAddr);
+		printDisassemble(mem.bytes, nsf.header.playDataAddr);
 		
 		System.err.println("Done");
 	}
@@ -107,13 +106,13 @@ public class TestReadApp {
 			
 				System.err.printf("%s: %s", toHex16(pc), op.name );
 				
-				for(int i = 1; i < op.len; i++) {
+				for(int i = 1; i < op.addrMode.instrLen; i++) {
 					System.err.printf(" %s", toHex8(cpuMem[pc + i]));
 				}
 				
 				System.err.printf("%n");
 				
-				pc += op.len;
+				pc += op.addrMode.instrLen;
 				
 			} else {
 				

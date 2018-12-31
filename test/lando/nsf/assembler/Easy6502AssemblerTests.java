@@ -2,6 +2,7 @@ package lando.nsf.assembler;
 
 import static org.junit.Assert.assertArrayEquals;
 
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class Easy6502AssemblerTests {
         return Easy6502TestName.asParameters();
     }
 
+    private final PrintStream out = System.err;
     private final Easy6502TestName name;
     
     public Easy6502AssemblerTests(Easy6502TestName name) {
@@ -29,14 +31,33 @@ public class Easy6502AssemblerTests {
     @Test
     public void runTest() throws Exception {
         
+        out.println("name: " + name);
+        
         List<String> asmLines = name.assemblyLines();
         List<String> hexLines = name.hexDumpLines();
         
         ExecutableImage asmImg = new SimpleAssembler().build(asmLines, 0x0600);
         ExecutableImage hexImg = new HexDumpReader().read(hexLines);
         
-        assertArrayEquals(
-                hexImg.joinAllSegments(), 
-                asmImg.joinAllSegments());
+        byte[] hexBytes = hexImg.joinAllSegments();
+        byte[] asmBytes = asmImg.joinAllSegments();
+        
+        out.println("expected:");
+        printSnippet(hexBytes);
+        
+        out.println("computed:");
+        printSnippet(asmBytes);
+        
+        assertArrayEquals(hexBytes, asmBytes);
+    }
+    
+    private void printSnippet(byte[] bytes) {
+        int len = Math.min(bytes.length, 50);
+        
+        for(int i = 0; i < len; i++) {
+            out.printf(" %2x", bytes[i]&255);
+        }
+        
+        out.println();
     }
 }

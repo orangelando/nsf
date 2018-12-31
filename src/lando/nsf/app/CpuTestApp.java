@@ -17,11 +17,8 @@ import javax.swing.JTextPane;
 
 import lando.nsf.*;
 import lando.nsf.core6502.CPU;
-import lando.nsf.core6502.DisassemblerUtils;
-import lando.nsf.core6502.HexUtils;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
-import lando.nsf.core6502.MEM;
 
 import org.apache.commons.lang3.Validate;
 
@@ -29,7 +26,7 @@ public final class CpuTestApp {
 	
 	public static void main(String [] args) throws Exception {
 		final File    file = new File("/Users/oroman/Downloads/super-mario-bros-2-nes-[NSF-ID1934].nsf");
-		final MEM mem = new MEM();
+		final NESMem mem = new NESMem();
 		final NSF nsf = NSFReader.readNSF(file);
 		final CPU cpu = new CPU(mem);
 		
@@ -68,7 +65,7 @@ public final class CpuTestApp {
 					
 				case 'z':
 					stopPlaying(playThread, done);
-					startPlaying(playThread, done, cpu, nsf);
+					startPlaying(playThread, done, cpu, mem, nsf);
 					break;
 					
 				case 'x':
@@ -94,6 +91,7 @@ public final class CpuTestApp {
 			final Thread[] playThread, 
 			final boolean[] done,
 			final CPU cpu, 
+			final NESMem mem,
 			final NSF nsf
 			) {
 		Validate.isTrue(playThread[0] == null);
@@ -136,7 +134,7 @@ public final class CpuTestApp {
 					
 					if ( (prevTime/nanos) != (time/nanos) ) {
 						cpu.PC = nsf.header.playDataAddr;
-						cycles += runUntilRTS(cpu);
+						cycles += runUntilRTS(cpu, mem);
 						calls++;
 					}
 					
@@ -180,7 +178,7 @@ public final class CpuTestApp {
 		playThread[0] = null;
 	}
 	
-	private static void initTune(NSF nsf, CPU cpu, MEM mem, int songNum) {
+	private static void initTune(NSF nsf, CPU cpu, NESMem mem, int songNum) {
 		System.err.println("Initializing...");
 		
 		Arrays.fill(mem.bytes, 0x0000, 0x0800, (byte)0);
@@ -197,7 +195,7 @@ public final class CpuTestApp {
 		cpu.PC = nsf.header.initDataAddr;
 		
 		long start = System.nanoTime();
-		int cycles = runUntilRTS(cpu);
+		int cycles = runUntilRTS(cpu, mem);
 		long end = System.nanoTime();
 		
 		System.err.println("init routine et: " + (end - start) + "ns");
@@ -205,19 +203,19 @@ public final class CpuTestApp {
 		System.err.println("cycle-et: " + (double)(end - start)/cycles + "ns");
 	}
 	
-	private static int runUntilRTS(CPU cpu) {
-		cpu.mem.reads = 0;
-		cpu.mem.writes = 0;
+	private static int runUntilRTS(CPU cpu, NESMem mem) {
+		mem.reads = 0;
+		mem.writes = 0;
 		int cycles = 0;
 		
-		while( cpu.mem.read(cpu.PC) != 0x60 ) {
+		while( mem.read(cpu.PC) != 0x60 ) {
 			cycles += cpu.step();
 		}
 		
 		return cycles;
 	}
 
-	private static void step(NSF nsf, CPU cpu, MEM mem, int steps) {
+	private static void step(NSF nsf, CPU cpu, NESMem mem, int steps) {
 		int cycles = 0;
 		mem.reads = 0;
 		mem.writes = 0;
@@ -241,7 +239,7 @@ public final class CpuTestApp {
 		System.err.println("cycle-et : " + (double)(end - start)/cycles + "ns");
 	}
 	
-	private static void update(NSF nsf, CPU cpu, MEM mem, JTextPane txtPane, int songNum) {
+	private static void update(NSF nsf, CPU cpu, NESMem mem, JTextPane txtPane, int songNum) {
 		Set<Integer> addressBlocks = new TreeSet<Integer>();
 		
 		addressBlocks.add( nsf.header.initDataAddr & 0xFF00 );
@@ -279,7 +277,7 @@ public final class CpuTestApp {
 		return (status & flag) == 0 ? "0" : "1";
 	}
 	
-	public static String render(final Set<Integer> addressBlocks, final MEM mem, final CPU cpu, NSF nsf, int songNum) {
+	public static String render(final Set<Integer> addressBlocks, final NESMem mem, final CPU cpu, NSF nsf, int songNum) {
 		Validate.notNull(addressBlocks);
 		Validate.notNull(mem);
 		Validate.notNull(cpu);
@@ -338,7 +336,7 @@ public final class CpuTestApp {
 			Set<Integer> writes,
 			int startAddr, 
 			int pc, 
-			MEM mem
+			NESMem mem
 			) {
 		
 		int numCols = 32;
@@ -403,7 +401,7 @@ public final class CpuTestApp {
 		out.println("</table>");
 	}
 	
-	private static void renderCPURegisters(PrintWriter out, CPU cpu, MEM mem) {
+	private static void renderCPURegisters(PrintWriter out, CPU cpu, NESMem mem) {
 		//
 		out.println("<table>");
 		
@@ -469,7 +467,7 @@ public final class CpuTestApp {
 			int len;
 			
 			if( opInfo != null ) {
-				len = opInfo.len;
+				len = opInfo.addrMode.instrLen;
 			} else {
 				len = 1;
 			}

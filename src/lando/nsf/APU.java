@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf;
 
 /**
  * http://wiki.nesdev.com/w/index.php/APU_Mixer

@@ -1,12 +1,12 @@
 package lando.nsf.app;
 
-import lando.nsf.core6502.HexUtils;
-import lando.nsf.core6502.MEM;
+import lando.nsf.HexUtils;
+import lando.nsf.NESMem;
 
 public final class MemMirrorTestApp {
 
 	public static void main(String [] args) throws Exception {
-		MEM mem = new MEM();
+		NESMem mem = new NESMem();
 		
 		//mirrored working RAM
 		for(int i = 0; i < 20; i++) {

@@ -9,7 +9,17 @@ import lando.nsf.ExecutableImage;
 import lando.nsf.MemorySegment;
 
 public final class HexDumpReader {
-
+    
+    public static byte[] asBytes(List<Integer> ints) {
+        byte[] bytes = new byte[ints.size()];
+        
+        for(int i = 0; i < ints.size(); i++) {
+            bytes[i] = ints.get(i).byteValue();
+        }
+        
+        return bytes;
+    }
+    
     public ExecutableImage read(List<String> lines) {
         
         List<Integer> byteVals = new ArrayList<>();
@@ -57,11 +67,7 @@ public final class HexDumpReader {
     }
     
     private ExecutableImage toImg(int startAddress, List<Integer> byteVals) {
-        byte[] bytes = new byte[byteVals.size()];
-        
-        for(int i = 0; i < byteVals.size(); i++) {
-            bytes[i] = byteVals.get(i).byteValue();
-        }
+        byte[] bytes = asBytes(byteVals);
         
         MemorySegment seg = new MemorySegment(0, bytes);
         

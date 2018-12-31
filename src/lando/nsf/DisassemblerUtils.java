@@ -1,4 +1,7 @@
-package lando.nsf.core6502;
+package lando.nsf;
+
+import lando.nsf.core6502.Instruction;
+import lando.nsf.core6502.Instructions;
 
 public final class DisassemblerUtils {
 
@@ -16,7 +19,7 @@ public final class DisassemblerUtils {
 		
 		String arg = "";
 		
-		switch(opInfo.len) {
+		switch(opInfo.addrMode.instrLen) {
 			case 2: arg = HexUtils.toHex8(b2); break;
 			case 3: arg = HexUtils.toHex16(b2 | (b3 << 8)); break;
 		}
