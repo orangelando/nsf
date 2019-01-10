@@ -69,7 +69,7 @@ public final class HexDumpReader {
     private ExecutableImage toImg(int startAddress, List<Integer> byteVals) {
         byte[] bytes = asBytes(byteVals);
         
-        MemorySegment seg = new MemorySegment(0, bytes);
+        MemorySegment seg = new MemorySegment(startAddress, bytes);
         
         ExecutableImage img = new ExecutableImage();
         

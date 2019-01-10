@@ -1,9 +1,22 @@
 package lando.nsf.assembler;
 
+import static lando.nsf.core6502.AddrMode.ABSOLUTE;
+import static lando.nsf.core6502.AddrMode.ABSOLUTE_X;
+import static lando.nsf.core6502.AddrMode.ABSOLUTE_Y;
+import static lando.nsf.core6502.AddrMode.ACCUMULATOR;
+import static lando.nsf.core6502.AddrMode.IMMEDIATE;
+import static lando.nsf.core6502.AddrMode.IMPLIED;
+import static lando.nsf.core6502.AddrMode.INDIRECT;
+import static lando.nsf.core6502.AddrMode.INDIRECT_X;
+import static lando.nsf.core6502.AddrMode.INDIRECT_Y;
+import static lando.nsf.core6502.AddrMode.RELATIVE;
+import static lando.nsf.core6502.AddrMode.ZERO_PAGE;
+import static lando.nsf.core6502.AddrMode.ZERO_PAGE_X;
+import static lando.nsf.core6502.AddrMode.ZERO_PAGE_Y;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 
@@ -13,14 +26,6 @@ import lando.nsf.core6502.AddrMode;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
 import lando.nsf.core6502.OpCodeName;
-
-import static lando.nsf.core6502.AddrMode.*;
-import static lando.nsf.core6502.AddrMode.ACCUMULATOR;
-import static lando.nsf.core6502.AddrMode.IMPLIED;
-import static lando.nsf.core6502.AddrMode.IMMEDIATE;
-import static lando.nsf.core6502.AddrMode.ZERO_PAGE;
-import static lando.nsf.core6502.AddrMode.ABSOLUTE;
-import static lando.nsf.core6502.AddrMode.RELATIVE;
 
 
 /**
@@ -39,13 +44,13 @@ public final class SimpleAssembler {
     private int programCounter;
     
     public ExecutableImage build(List<String> lines) {
-        return build(lines, DEFAULT_START_ADDR);
+        return build(DEFAULT_START_ADDR, lines);
     }
 
     /**
      * Any address deceleration (ie ORG commands) will override "startAddress".
      */
-    public ExecutableImage build(List<String> lines, int startAddress) {
+    public ExecutableImage build(int startAddress, List<String> lines) {
         Validate.notNull(lines);
         Validate.notEmpty(lines);
         Validate.noNullElements(lines);
@@ -60,13 +65,15 @@ public final class SimpleAssembler {
         this.addressLabels.clear();
         reader.read(lines, (line) -> addAnyAddressLabel(line));
         
-        logSymbolsAndLabels();
+        //logSymbolsAndLabels();
         
         ExecutableImage img = new ExecutableImage();
         ExecImgBuilder bc2 = new ExecImgBuilder(img);
         InstrByteEmitter bc = new InstrByteEmitter(bc2);
         
         this.programCounter = startAddress;
+        bc2.setAddress(startAddress);
+        
         reader.read(lines, (line) -> processLine(line, bc));
         
         bc2.flush();

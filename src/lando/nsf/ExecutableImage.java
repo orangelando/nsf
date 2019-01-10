@@ -44,7 +44,13 @@ public final class ExecutableImage {
         byte[] bytes = new byte[1 << 16];
         
         for(MemorySegment seg: memorySegments) {
-            System.arraycopy(seg.getBytes(), 0, bytes, seg.getStartAddress(), seg.getBytes().length);
+            System.arraycopy(
+                    seg.getBytes(),        //src 
+                    0,                     //srcPos
+                    bytes,                 //dest
+                    seg.getStartAddress(), //destPos 
+                    seg.getBytes().length  //length
+                    );
         }
         
         return bytes;

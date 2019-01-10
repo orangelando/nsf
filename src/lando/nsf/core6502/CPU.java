@@ -3,6 +3,11 @@ package lando.nsf.core6502;
 import org.apache.commons.lang3.Validate;
 
 public final class CPU {
+    
+    private static enum FlagStatus {
+        SET, CLEAR
+    }
+    
 	public static final int STATUS_C = 0x01;
 	public static final int STATUS_Z = 0x02;
 	public static final int STATUS_I = 0x04;
@@ -15,24 +20,25 @@ public final class CPU {
 	
 	private final Memory mem;
 	
-	public int P  = 0;
+	private int pageCrossed;
+	private int branchTaken;
+	private int branchedToNewPage;
+	
+	public int P  = 0;  
 	public int PC = 0;
 	public int A  = 0;
 	public int X  = 0;
 	public int Y  = 0;
-	public int S  = 0;
-	
-	public int cycles = 0;
-	
+	public int S  = 0; 
+		
 	public CPU(Memory mem) {
 		Validate.notNull(mem);
 		this.mem = mem;
 	}
 	
 	public int step() {
-		cycles = 0;
-		
-		int addr;
+	    
+		int cycles;
 		int opCode = mem.read(PC++);
 		
 		/**
@@ -42,24 +48,24 @@ public final class CPU {
 		switch(opCode) {
 		
 			//ADC
-			case 0x69: adc(readImmediate());		 break;
-			case 0x65: adc(readZeroPage());			 break;
-			case 0x75: adc(readZeroPageX()); 		 break;
-			case 0x6D: adc(readAbsolute());			 break;
-			case 0x7D: adc(readAbsoluteX());		 break;
-			case 0x79: adc(readAbsoluteY());		 break;
-			case 0x61: adc(readIndexedIndirectX());	 break;
-			case 0x71: adc(readIndirectIndexedY());	 break;
+			case 0x69: adc(readImmediate());		 cycles = 2;               break;
+			case 0x65: adc(readZeroPage ());		 cycles = 3;               break;
+			case 0x75: adc(readZeroPageX()); 		 cycles = 4;               break;
+			case 0x6D: adc(readAbsolute ()); 	     cycles = 4;               break;
+			case 0x7D: adc(readAbsoluteX());		 cycles = 4 + pageCrossed; break;
+			case 0x79: adc(readAbsoluteY());		 cycles = 4 + pageCrossed; break;
+			case 0x61: adc(readIndexedIndirectX());	 cycles = 6;               break;
+			case 0x71: adc(readIndirectIndexedY());	 cycles = 5 + pageCrossed; break;
 			
 			//AND
-			case 0x29: A &= readImmediate();       setZN(A); break;
-			case 0x25: A &= readZeroPage();        setZN(A); break;
-			case 0x35: A &= readZeroPageX();       setZN(A); break;
-			case 0x2D: A &= readAbsolute();        setZN(A); break;
-			case 0x3D: A &= readAbsolute();        setZN(A); break;
-			case 0x39: A &= readAbsoluteY();       setZN(A); break;
-			case 0x21: A &= readIndexedIndirectX(); setZN(A); break;
-			case 0x31: A &= readIndirectIndexedY(); setZN(A); break;
+			case 0x29: and(readImmediate());         cycles = 2;               break;
+			case 0x25: and(readZeroPage ());         cycles = 3;               break;
+			case 0x35: and(readZeroPageX());         cycles = 4;               break;
+			case 0x2D: and(readAbsolute ());         cycles = 4;               break;
+			case 0x3D: and(readAbsoluteX());         cycles = 4 + pageCrossed; break;
+			case 0x39: and(readAbsoluteY());         cycles = 4 + pageCrossed; break;
+			case 0x21: and(readIndexedIndirectX());  cycles = 6;               break;
+			case 0x31: and(readIndirectIndexedY());  cycles = 5 + pageCrossed; break;
 			
 			//ASL
 			case 0x0A: aslAcc();                     cycles = 2; break;
@@ -69,41 +75,35 @@ public final class CPU {
 			case 0x1E: aslMem(readAbsoluteXAddr());  cycles = 7; break;
 			
 			//BCC
-			case 0x90: branchIfClear(STATUS_C); break;
+			case 0x90: branchIfClear(STATUS_C); cycles = branchCycles(); break;
 				
 			//BCS
-			case 0xB0: branchIfSet(STATUS_C); break;
+			case 0xB0: branchIfSet(STATUS_C);   cycles = branchCycles(); break;
 				
 			//BEQ
-			case 0xF0: branchIfSet(STATUS_Z); break;
+			case 0xF0: branchIfSet(STATUS_Z);   cycles = branchCycles(); break;
 				
 			//BIT
-			case 0x24: bit(readZeroPage()); break;
-			case 0x2C: bit(readAbsolute()); break;
+			case 0x24: bit(readZeroPage()); cycles = 3; break;
+			case 0x2C: bit(readAbsolute()); cycles = 4; break;
 			
 			//BMI
-			case 0x30: branchIfSet(STATUS_N);
+			case 0x30: branchIfSet(STATUS_N);   cycles = branchCycles(); break;
 			
 			//BNE
-			case 0xD0: branchIfClear(STATUS_Z); break;
+			case 0xD0: branchIfClear(STATUS_Z); cycles = branchCycles(); break;
 			
 			//BPL
-			case 0x10: branchIfClear(STATUS_N); break;
+			case 0x10: branchIfClear(STATUS_N); cycles = branchCycles(); break;
 			
 			//BRK:
-			case 0x00:
-				pushAddr(PC);
-				push(P);
-				PC = (mem.read(0xFFFF) << 8) | mem.read(0xFFFE);
-				setStatus(true, STATUS_B);
-				cycles = 7;
-				break;
+			case 0x00: brk(); cycles = 7; break;
 			
 			//BVC
-			case 0x50: branchIfClear(STATUS_O); break;
+			case 0x50: branchIfClear(STATUS_O); cycles = branchCycles(); break;
 			
 			//BVS
-			case 0x70: branchIfSet(STATUS_O); break;
+			case 0x70: branchIfSet(STATUS_O); cycles = branchCycles(); break;
 			
 			//CLC
 			case 0x18: setStatus(false, STATUS_C); cycles = 2; break;
@@ -118,93 +118,89 @@ public final class CPU {
 			case 0xB8: setStatus(false, STATUS_O); cycles = 2; break;
 			
 			//CMP
-			case 0xC9: cmp(A, readImmediate()); break;
-			case 0xC5: cmp(A, readZeroPage()); break;
-			case 0xD5: cmp(A, readZeroPageX()); break;
-			case 0xCD: cmp(A, readAbsolute()); break;
-			case 0xDD: cmp(A, readAbsoluteX()); break;
-			case 0xD9: cmp(A, readAbsoluteY()); break;
-			case 0xC1: cmp(A, readIndexedIndirectX()); break;
-			case 0xD1: cmp(A, readIndirectIndexedY()); break;
+			case 0xC9: cmp(A, readImmediate());        cycles = 2;               break;
+			case 0xC5: cmp(A, readZeroPage ());        cycles = 3;               break;
+			case 0xD5: cmp(A, readZeroPageX());        cycles = 4;               break;
+			case 0xCD: cmp(A, readAbsolute ());        cycles = 4;               break;
+			case 0xDD: cmp(A, readAbsoluteX());        cycles = 4 + pageCrossed; break;
+			case 0xD9: cmp(A, readAbsoluteY());        cycles = 4 + pageCrossed; break;
+			case 0xC1: cmp(A, readIndexedIndirectX()); cycles = 6;               break;
+			case 0xD1: cmp(A, readIndirectIndexedY()); cycles = 5 + pageCrossed; break;
 			
 			//CPX
-			case 0xE0: cmp(X, readImmediate()); break;
-			case 0xE4: cmp(X, readZeroPage()); break;
-			case 0xEC: cmp(X, readAbsolute()); break;
+			case 0xE0: cmp(X, readImmediate()); cycles = 2; break;
+			case 0xE4: cmp(X, readZeroPage ()); cycles = 3; break;
+			case 0xEC: cmp(X, readAbsolute ()); cycles = 4; break;
 			
 			//CPY
-			case 0xC0: cmp(Y, readImmediate()); break;
-			case 0xC4: cmp(Y, readZeroPage()); break;
-			case 0xCC: cmp(Y, readAbsolute()); break;
+			case 0xC0: cmp(Y, readImmediate()); cycles = 2; break;
+			case 0xC4: cmp(Y, readZeroPage ()); cycles = 3; break;
+			case 0xCC: cmp(Y, readAbsolute ()); cycles = 4; break;
 			
 			//DEC
-			case 0xC6: addr = readZeroPageAddr();  mem.write(addr, mem.read(addr) - 1); setZN(mem.read(addr)); cycles = 5; break;
-			case 0xD6: addr = readZeroPageXAddr(); mem.write(addr, mem.read(addr) - 1); setZN(mem.read(addr)); cycles = 6; break;
-			case 0xCE: addr = readAbsoluteAddr();  mem.write(addr, mem.read(addr) - 1); setZN(mem.read(addr)); cycles = 6; break;
-			case 0xDE: addr = readAbsoluteX();     mem.write(addr, mem.read(addr) - 1); setZN(mem.read(addr)); cycles = 7; break;
+			case 0xC6: dec(readZeroPageAddr());  cycles = 5; break;
+			case 0xD6: dec(readZeroPageXAddr()); cycles = 6; break;
+			case 0xCE: dec(readAbsoluteAddr());  cycles = 6; break;
+			case 0xDE: dec(readAbsoluteX());     cycles = 7; break;
 			
 			//DEX
-			case 0xCA: X = (X - 1) & 0xFF; setZN(X); cycles = 2; break;
+			case 0xCA: dex(); cycles = 2; break;
 			
 			//DEY
-			case 0x88: Y = (Y - 1) & 0xFF; setZN(Y); cycles = 2; break;
+			case 0x88: dey(); cycles = 2; break;
 			
 			//EOR
-			case 0x49: A ^= readImmediate();        setZN(A); break;
-			case 0x45: A ^= readZeroPage();         setZN(A); break;
-			case 0x55: A ^= readZeroPageX();        setZN(A); break;
-			case 0x4D: A ^= readAbsolute();         setZN(A); break;
-			case 0x5D: A ^= readAbsoluteX();        setZN(A); break;
-			case 0x59: A ^= readAbsoluteY();        setZN(A); break;
-			case 0x41: A ^= readIndexedIndirectX(); setZN(A); break;
-			case 0x51: A ^= readIndirectIndexedY(); setZN(A); break;
+			case 0x49: eor(readImmediate());         cycles = 2;               break;
+			case 0x45: eor(readZeroPage());          cycles = 3;               break;
+			case 0x55: eor(readZeroPageX());         cycles = 4;               break;
+			case 0x4D: eor(readAbsolute());          cycles = 4;               break;
+			case 0x5D: eor(readAbsoluteX());         cycles = 4 + pageCrossed; break;
+			case 0x59: eor(readAbsoluteY());         cycles = 4 + pageCrossed; break;
+			case 0x41: eor(readIndexedIndirectX());  cycles = 6;               break;
+			case 0x51: eor(readIndirectIndexedY());  cycles = 5 + pageCrossed; break;
 			
 			//INC
-			case 0xE6: addr = readZeroPageAddr();  mem.write(addr, mem.read(addr) + 1); setZN(mem.read(addr)); cycles = 5; break;
-			case 0xF6: addr = readZeroPageXAddr(); mem.write(addr, mem.read(addr) + 1); setZN(mem.read(addr)); cycles = 6; break;
-			case 0xEE: addr = readAbsoluteAddr();  mem.write(addr, mem.read(addr) + 1); setZN(mem.read(addr)); cycles = 6; break;
-			case 0xFE: addr = readAbsoluteX();     mem.write(addr, mem.read(addr) + 1); setZN(mem.read(addr)); cycles = 7; break;
+			case 0xE6: inc(readZeroPageAddr());  cycles = 5; break;
+			case 0xF6: inc(readZeroPageXAddr()); cycles = 6; break;
+			case 0xEE: inc(readAbsoluteAddr());  cycles = 6; break;
+			case 0xFE: inc(readAbsoluteX());     cycles = 7; break;
 			
 			//INX
-			case 0xE8: X = (X + 1) & 0xFF; setZN(X); cycles = 2; break;
+			case 0xE8: inx(); cycles = 2; break;
 			
 			//INY
-			case 0xC8: Y = (Y + 1) & 0xFF; setZN(Y); cycles = 2; break;
+			case 0xC8: iny(); cycles = 2; break;
 			
 			//JMP
-			case 0x4C: PC = readAbsoluteAddr(); break;
-			case 0x6C: PC = readIndirectAddr(); break;
+			case 0x4C: jmp(readAbsoluteAddr()); cycles = 3; break;
+			case 0x6C: jmp(readIndirectAddr()); cycles = 5; break;
 			
 			//JSR
-			case 0x20:
-					pushAddr(PC - 1);
-					PC = readAbsoluteAddr(); 
-					cycles = 6;
-					break;
+			case 0x20: jsr(); cycles = 6; break;
 			
 			//LDA
-			case 0xA9: A = readImmediate();       setZN(A); break;
-			case 0xA5: A = readZeroPage();        setZN(A); break;
-			case 0xB5: A = readZeroPageX();       setZN(A); break;
-			case 0xAD: A = readAbsolute();        setZN(A); break;
-			case 0xBD: A = readAbsoluteX();       setZN(A); break;
-			case 0xB9: A = readAbsoluteY();       setZN(A); break;
-			case 0xA1: A = readIndexedIndirectX(); setZN(A); break;
-			case 0xB1: A = readIndirectIndexedY(); setZN(A); break;
+			case 0xA9: lda(readImmediate());        cycles = 2;               break;
+			case 0xA5: lda(readZeroPage());         cycles = 3;               break;
+			case 0xB5: lda(readZeroPageX());        cycles = 4;               break;
+			case 0xAD: lda(readAbsolute());         cycles = 4;               break;
+			case 0xBD: lda(readAbsoluteX());        cycles = 4 + pageCrossed; break;
+			case 0xB9: lda(readAbsoluteY());        cycles = 4 + pageCrossed; break;
+			case 0xA1: lda(readIndexedIndirectX()); cycles = 6;               break;
+			case 0xB1: lda(readIndirectIndexedY()); cycles = 5 + pageCrossed; break;
 				
 			//LDX
-			case 0xA2: X = readImmediate(); setZN(X); break;
-			case 0xA6: X = readZeroPage();  setZN(X); break;
-			case 0xB6: X = readZeroPageY(); setZN(X); break;
-			case 0xAE: X = readAbsolute();  setZN(X); break;
-			case 0xBE: X = readAbsoluteY(); setZN(X); break;
+			case 0xA2: ldx(readImmediate()); cycles = 2;               break;
+			case 0xA6: ldx(readZeroPage());  cycles = 3;               break;
+			case 0xB6: ldx(readZeroPageY()); cycles = 4;               break;
+			case 0xAE: ldx(readAbsolute());  cycles = 4;               break;
+			case 0xBE: ldx(readAbsoluteY()); cycles = 4 + pageCrossed; break;
 			
 			//LDY
-			case 0xA0: Y = readImmediate(); setZN(Y); break;
-			case 0xA4: Y = readZeroPage();  setZN(Y); break;
-			case 0xB4: Y = readZeroPageX(); setZN(Y); break;
-			case 0xAC: Y = readAbsolute();  setZN(Y); break;
-			case 0xBC: Y = readAbsoluteX(); setZN(Y); break;
+			case 0xA0: ldy(readImmediate()); cycles = 2;               break;
+			case 0xA4: ldy(readZeroPage());  cycles = 3;               break;
+			case 0xB4: ldy(readZeroPageX()); cycles = 4;               break;
+			case 0xAC: ldy(readAbsolute());  cycles = 4;               break;
+			case 0xBC: ldy(readAbsoluteX()); cycles = 4 + pageCrossed; break;
 			
 			//LSR
 			case 0x4A: lsrAcc();                    cycles = 2; break;
@@ -217,14 +213,14 @@ public final class CPU {
 			case 0xEA: cycles = 2; break;
 			
 			//ORA
-			case 0x09: A |= readImmediate();       setZN(A); break;
-			case 0x05: A |= readZeroPage();        setZN(A); break;
-			case 0x15: A |= readZeroPageX();       setZN(A); break;
-			case 0x0D: A |= readAbsolute();        setZN(A); break;
-			case 0x1D: A |= readAbsoluteX();       setZN(A); break;
-			case 0x19: A |= readAbsoluteY();       setZN(A); break;
-			case 0x01: A |= readIndexedIndirectX(); setZN(A); break;
-			case 0x11: A |= readIndirectIndexedY(); setZN(A); break;
+			case 0x09: ora(readImmediate());        cycles = 2;               break;
+			case 0x05: ora(readZeroPage());         cycles = 3;               break;
+			case 0x15: ora(readZeroPageX());        cycles = 4;               break;
+			case 0x0D: ora(readAbsolute());         cycles = 4;               break;
+			case 0x1D: ora(readAbsoluteX());        cycles = 4 + pageCrossed; break;
+			case 0x19: ora(readAbsoluteY());        cycles = 4 + pageCrossed; break;
+			case 0x01: ora(readIndexedIndirectX()); cycles = 6;               break;
+			case 0x11: ora(readIndirectIndexedY()); cycles = 5 + pageCrossed; break;
 			
 			//PHA
 			case 0x48: push(A); cycles = 3; break;
@@ -253,27 +249,20 @@ public final class CPU {
 			case 0x7E: rorMem(readAbsoluteXAddr()); cycles = 7; break;
 			
 			//RTI
-			case 0x40:
-				P = pull();
-				PC = pullAddr();
-				cycles = 6; 
-				break;
+			case 0x40: rti(); cycles = 6; break;
 				
 			//RTS
-			case 0x60: 
-				PC = pullAddr();
-				cycles = 6;
-				break;
+			case 0x60: rts(); cycles = 6; break;
 				
 			//SBC
-			case 0xE9: sbc(readImmediate());        break;
-			case 0xE5: sbc(readZeroPage());         break;
-			case 0xF5: sbc(readZeroPageX());        break;
-			case 0xED: sbc(readAbsolute());         break;
-			case 0xFD: sbc(readAbsoluteX());        break;
-			case 0xF9: sbc(readAbsoluteY());        break;
-			case 0xE1: sbc(readIndexedIndirectX()); break;
-			case 0xF1: sbc(readIndirectIndexedY()); break;
+			case 0xE9: sbc(readImmediate());        cycles = 2;               break;
+			case 0xE5: sbc(readZeroPage());         cycles = 3;               break;
+			case 0xF5: sbc(readZeroPageX());        cycles = 4;               break;
+			case 0xED: sbc(readAbsolute());         cycles = 4;               break;
+			case 0xFD: sbc(readAbsoluteX());        cycles = 4 + pageCrossed; break;
+			case 0xF9: sbc(readAbsoluteY());        cycles = 4 + pageCrossed; break;
+			case 0xE1: sbc(readIndexedIndirectX()); cycles = 6;               break;
+			case 0xF1: sbc(readIndirectIndexedY()); cycles = 5 + pageCrossed; break;
 			
 			//SEC
 			case 0x38: setStatus(true, STATUS_C); cycles = 2; break;
@@ -285,41 +274,41 @@ public final class CPU {
 			case 0x78: setStatus(true, STATUS_I); cycles = 2; break;
 			
 			//STA
-			case 0x85: mem.write( readZeroPageAddr(),     A); cycles = 3; break;
-			case 0x95: mem.write( readZeroPageXAddr(),    A); cycles = 4; break;
-			case 0x8D: mem.write( readAbsoluteAddr(),     A); cycles = 4; break;
-			case 0x9D: mem.write( readAbsoluteXAddr(),    A); cycles = 5; break;
-			case 0x99: mem.write( readAbsoluteYAddr(),    A); cycles = 5; break;
-			case 0x81: mem.write( readIndexedIndirectX(), A); cycles = 6; break;
-			case 0x91: mem.write( readIndirectIndexedY(), A); cycles = 6; break;
+			case 0x85: sta(readZeroPageAddr());     cycles = 3; break;
+			case 0x95: sta(readZeroPageXAddr());    cycles = 4; break;
+			case 0x8D: sta(readAbsoluteAddr());     cycles = 4; break;
+			case 0x9D: sta(readAbsoluteXAddr());    cycles = 5; break;
+			case 0x99: sta(readAbsoluteYAddr());    cycles = 5; break;
+			case 0x81: sta(readIndexedIndirectX()); cycles = 6; break;
+			case 0x91: sta(readIndirectIndexedY()); cycles = 6; break;
 			
 			//STX
-			case 0x86: mem.write( readZeroPageAddr(),     X); cycles = 3; break;
-			case 0x96: mem.write( readZeroPageYAddr(),    X); cycles = 4; break;
-			case 0x8E: mem.write( readAbsoluteAddr(),     X); cycles = 4; break;
+			case 0x86: stx(readZeroPageAddr());      cycles = 3; break;
+			case 0x96: stx(readZeroPageYAddr());     cycles = 4; break;
+			case 0x8E: stx(readAbsoluteAddr());      cycles = 4; break;
 			
 			//STY
-			case 0x84: mem.write( readZeroPageAddr(),     Y); cycles = 3; break;
-			case 0x94: mem.write( readZeroPageXAddr(),    Y); cycles = 4; break;
-			case 0x8C: mem.write( readAbsoluteAddr(),     Y); cycles = 4; break;
+			case 0x84: sty(readZeroPageAddr());      cycles = 3; break;
+			case 0x94: sty(readZeroPageXAddr());     cycles = 4; break;
+			case 0x8C: sty(readAbsoluteAddr());      cycles = 4; break;
 			
 			//TAX
-			case 0xAA: X = A; cycles = 2; setZN(X); break;
+			case 0xAA: tax(); cycles = 2; break;
 			
 			//TAY
-			case 0xA8: Y = A; cycles = 2; setZN(Y); break;
+			case 0xA8: tay(); cycles = 2; break;
 			
 			//TSX
-			case 0xBA: X = S; cycles = 2; setZN(X); break;
+			case 0xBA: tsx(); cycles = 2; break;
 			
 			//TXA
-			case 0x8A: A = X; cycles = 2; setZN(A); break;
+			case 0x8A: txa(); cycles = 2; break;
 			
 			//TXS
-			case 0x9A: S = X; cycles = 2; break;
+			case 0x9A: txs(); cycles = 2; break;
 			
 			//TYA
-			case 0x98: A = Y; setZN(A); cycles = 2; break;
+			case 0x98: tya(); cycles = 2; break;
 				
 			//
 			default: 
@@ -334,7 +323,7 @@ public final class CPU {
 	}
 	
 	private int pull() {
-		return mem.read(STACK_START + ((S++) & 0xFF));
+		return mem.read(STACK_START + ((++S) & 0xFF));
 	}
 	
 	private void pushAddr(int addr) {
@@ -351,30 +340,33 @@ public final class CPU {
 		return fullAddr(adh, adl);
 	}
 	
+	private int branchCycles() {
+	    return 2 + branchTaken + branchedToNewPage; 
+	}
+	
 	//
 	
 	private int readImmediateAddr() {
-		cycles=2;
 		return PC++;
 	}
 	
 	private int readZeroPageAddr() {
 		int adl = mem.read(PC++);
-		cycles=3;
+		
 		return adl;
 	}
 	
 	private int readZeroPageXAddr() {
 		int adl = mem.read(PC++);
 		int ad = (adl + X) & 0xFF;
-		cycles = 4;
+		
 		return ad;
 	}
 	
 	private int readZeroPageYAddr() {
 		int adl = mem.read(PC++);
 		int ad = (adl + Y) & 0xFF;
-		cycles = 4;
+		
 		return ad;
 	}
 	
@@ -382,7 +374,7 @@ public final class CPU {
 		int adl = mem.read(PC++);
 		int adh = mem.read(PC++);
 		int ad  = fullAddr(adh, adl);
-		cycles = 4;
+		
 		return ad;
 	}
 	
@@ -390,8 +382,8 @@ public final class CPU {
 		int bal = mem.read(PC++);
 		int bah = mem.read(PC++);
 		int ba  = fullAddr(bah, bal);
-		int ad   = ba + X;
-		cycles = 4 + pageCross(ba, ad);
+		int ad  = ba + X;
+		
 		return ad;
 	}
 	
@@ -400,7 +392,7 @@ public final class CPU {
 		int bah = mem.read(PC++);
 		int ba  = fullAddr(bah, bal);
 		int ad  = ba + Y;
-		cycles = 4 + pageCross(ba, ad);
+		
 		return ad;
 	}
 	
@@ -409,7 +401,7 @@ public final class CPU {
 		int adl = mem.read((ial + X + 0) & 0xFF);
 		int adh = mem.read((ial + X + 1) & 0xFF);
 		int ad  = fullAddr(adh, adl);
-		cycles = 6;
+		
 		return ad;
 	}
 	
@@ -419,7 +411,7 @@ public final class CPU {
 		int bah = mem.read((ial + 1) & 0xFF);
 		int ba  = fullAddr(bah, bal);
 		int ad  = ba + Y;
-		cycles = 5 + pageCross(ba, ad);
+		
 		return ad;
 	}
 	
@@ -428,7 +420,7 @@ public final class CPU {
 		int adl = mem.read((ial + 0) & 0xFF);
 		int adh = mem.read((ial + 1) & 0xFF);
 		int ad  = fullAddr(adh, adl);
-		cycles = 5;
+		
 		return ad;
 	}
 	
@@ -469,12 +461,15 @@ public final class CPU {
 	private int readIndirectIndexedY() {
 		return mem.read(readIndirectIndexedYAddr());
 	}
-	
-	private int readIndirect() {
-		return mem.read(readIndirectAddr());
-	}
-	
+		
 	//
+	
+	private void brk() {
+        pushAddr(PC);
+        push(P);
+        PC = (mem.read(0xFFFF) << 8) | mem.read(0xFFFE);
+        setStatus(true, STATUS_B);
+	}
 	
 	private void setZN(int n) {
 		setStatus( n == 0, STATUS_Z);
@@ -501,6 +496,11 @@ public final class CPU {
 		setStatus( (A & 0x100) != 0, STATUS_C);
 		setStatus( oldSign != newSign, STATUS_O);
 		A &= 0xFF;
+	}
+	
+	private void and(int M) {
+	    A = A & M;
+	    setZN(A);
 	}
 	
 	private void sbc(int M) {
@@ -589,6 +589,138 @@ public final class CPU {
 		setZN(M);
 	}
 	
+	private void dec(int addr) {
+	    int M = mem.read(addr) - 1;
+	    
+	    mem.write(addr, M);
+	    
+	    setZN(M); 
+	}
+	
+	private void dex() {
+	    X = (X - 1) & 0xFF;
+	    
+	    setZN(X); 
+	}
+	
+	private void dey() {
+	    Y = (Y - 1) & 0xFF; 
+	    
+	    setZN(Y); 
+	}
+	
+	private void eor(int M) {
+	    A = A^M;
+	    
+	    setZN(A);
+	}
+	
+   private void inc(int addr) {
+        int M = mem.read(addr) + 1;
+        
+        mem.write(addr, M);
+        
+        setZN(M); 
+    }
+    
+    private void inx() {
+        X = (X + 1) & 0xFF;
+        
+        setZN(X); 
+    }
+    
+    private void iny() {
+        Y = (Y + 1) & 0xFF; 
+        
+        setZN(Y); 
+    }
+    
+    private void jmp(int addr) {
+        PC = addr;
+    }
+    
+    private void jsr() {
+        int addr = readAbsoluteAddr();
+        pushAddr(PC - 1);
+        PC = addr;
+    }
+    
+    private void lda(int M) {
+        A = M;
+        setZN(A);
+    }
+    
+    private void ldx(int M) {
+        X = M;
+        setZN(M);
+    }
+    
+    private void ldy(int M) {
+        Y = M;
+        setZN(Y);
+    }
+    
+    private void ora(int M) {
+        A = A | M;
+        setZN(A);
+    }
+    
+    private void rti() {
+        P = pull();
+        PC = pullAddr();
+    }
+    
+    private void rts() {
+        PC = pullAddr();
+        PC++; //"fix" PC (see page 108 of MOS 6502 programming manual)
+    }
+
+    private void sta(int addr) {
+        mem.write(addr, A);
+    }
+    
+    private void stx(int addr) {
+        mem.write(addr, X);
+    }
+    
+    private void sty(int addr) {
+        mem.write(addr, Y);
+    }
+    
+    private void tax() {
+        X = A;
+        
+        setZN(X); 
+    }
+    
+    private void tay() {
+        Y = A; 
+        
+        setZN(Y); 
+    }
+    
+    private void tsx() {
+        X = S; 
+        
+        setZN(X); 
+    }
+    
+    private void txa() {
+        A = X; 
+        
+        setZN(A); 
+    }
+    
+    private void txs() {
+        S = X; 
+    }
+    
+    private void tya() {
+        A = Y; 
+        
+        setZN(A); 
+    }
+	
 	private int pageCross(int ad1, int ad2) {
 		 return (ad1 & 0xFF00) != (ad2 & 0xFF00) ? 1 : 0;
 	}
@@ -598,26 +730,31 @@ public final class CPU {
 	}
 	
 	private void branchIfClear(int flag) {
-		cycles = 2;
-		int offset = (byte)readImmediate();
-		
-		if( (P & flag) == 0 ) {
-			int oldPC = PC;
-			PC += offset;
-			cycles += 1 + pageCross(oldPC, PC);
-		}
+	    branch(flag, FlagStatus.CLEAR);
 	}
 	
 	private void branchIfSet(int flag) {
-		cycles = 2;
-		int offset = (byte)readImmediate();
-		
-		if( (P & flag) != 0 ) {
-			int oldPC = PC;
-			PC += offset;
-			cycles += 1 + pageCross(oldPC, PC);
-		}
+	    branch(flag, FlagStatus.SET);
 	}
+	
+   private void branch(int flag, FlagStatus desiredStatus) {
+        
+        int offset = (byte)readImmediate();
+        FlagStatus status = (P & flag) == 0 ? FlagStatus.CLEAR : FlagStatus.SET;
+        
+        if( status == desiredStatus ) {
+            int oldPC = PC;
+            
+            PC += offset;
+            
+            branchTaken = 1;
+            branchedToNewPage = pageCross(oldPC, PC);
+        } else {
+            branchTaken = 0;
+            branchedToNewPage = 0;
+        }
+    }
+
 	
 	private void bit(int M) {
 		setStatus( (A & M) == 0, STATUS_Z);

@@ -420,7 +420,7 @@ public final class CpuTestApp {
 		out.printf("<td>%s</td>", HexUtils.toHex8(cpu.X));
 		out.printf("<td>%s</td>", HexUtils.toHex8(cpu.Y));
 		out.printf("<td>%s</td>", HexUtils.toHex8(cpu.S));
-		out.printf("<td>%d</td>", cpu.cycles);
+		//out.printf("<td>%d</td>", cpu.cycles);
 		out.printf("</tr>");
 		
 		out.println("</table>");
