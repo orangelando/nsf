@@ -31,11 +31,11 @@ public enum Easy6502TestName {
                 .collect(Collectors.toList());
     }
     
-    List<String> assemblyLines() throws Exception {
+    public List<String> assemblyLines() throws Exception {
         return readLines(resourcePath("s"));
     }
     
-    List<String> hexDumpLines() throws Exception {
+    public List<String> hexDumpLines() throws Exception {
         return readLines(resourcePath("hexdump"));
     }
 

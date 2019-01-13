@@ -17,6 +17,8 @@ import static lando.nsf.core6502.AddrMode.ZERO_PAGE_Y;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
 
@@ -43,14 +45,14 @@ public final class SimpleAssembler {
     
     private int programCounter;
     
-    public ExecutableImage build(List<String> lines) {
+    public AssemblerResults build(List<String> lines) {
         return build(DEFAULT_START_ADDR, lines);
     }
 
     /**
      * Any address deceleration (ie ORG commands) will override "startAddress".
      */
-    public ExecutableImage build(int startAddress, List<String> lines) {
+    public AssemblerResults build(int startAddress, List<String> lines) {
         Validate.notNull(lines);
         Validate.notEmpty(lines);
         Validate.noNullElements(lines);
@@ -59,11 +61,11 @@ public final class SimpleAssembler {
         LineReader reader = new LineReader();
         
         this.defines.clear();
-        reader.read(lines, (line) -> addAnyDefinedSymbol(line));
+        reader.read(lines, (line, lineNum) -> addAnyDefinedSymbol(line));
         
         this.programCounter = startAddress;
         this.addressLabels.clear();
-        reader.read(lines, (line) -> addAnyAddressLabel(line));
+        reader.read(lines, (line, lineNum) -> addAnyAddressLabel(line));
         
         //logSymbolsAndLabels();
         
@@ -74,11 +76,13 @@ public final class SimpleAssembler {
         this.programCounter = startAddress;
         bc2.setAddress(startAddress);
         
-        reader.read(lines, (line) -> processLine(line, bc));
+        TreeMap<Integer, Integer> addrsToLineNum = new TreeMap<>();
+        
+        reader.read(lines, (line, lineNum) -> processLine(line, lineNum, addrsToLineNum, bc));
         
         bc2.flush();
         
-        return img;
+        return new AssemblerResults(img, addrsToLineNum, addressLabels);
     }
     
     private void logSymbolsAndLabels() {
@@ -262,7 +266,12 @@ public final class SimpleAssembler {
         return tokens[0].endsWith(ADDR_LABEL_DELIM);
     }
     
-    private void processLine(String line, InstrByteEmitter emitter) {
+    private void processLine(
+            String line, 
+            int lineNum, 
+            SortedMap<Integer, Integer> addrsToLineNum, 
+            InstrByteEmitter emitter) {
+        
         line = stripComments(line);
         line = retabAndTrim(line);
         
@@ -283,6 +292,9 @@ public final class SimpleAssembler {
                 return;  //line was only an address label
             }
         }
+        
+        //I have a legit instruction!
+        addrsToLineNum.put(programCounter, lineNum);
         
         OpCodeName name = OpCodeName.valueOf(tokens[0].toUpperCase());
         Validate.notNull(name);

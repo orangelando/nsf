@@ -16,5 +16,7 @@ public final class HexUtils {
 				HEX_CHARS[(n >> 0) & 0xF] ;
 	}
 
-    public static final char[] HEX_CHARS = "0123456789ABCDEF".toCharArray();	
+    public static final char[] HEX_CHARS = "0123456789ABCDEF"
+            .toLowerCase()
+            .toCharArray();	
 }

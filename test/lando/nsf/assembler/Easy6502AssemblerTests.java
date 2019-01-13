@@ -36,7 +36,7 @@ public class Easy6502AssemblerTests {
         List<String> asmLines = name.assemblyLines();
         List<String> hexLines = name.hexDumpLines();
         
-        ExecutableImage asmImg = new SimpleAssembler().build(0x0600, asmLines);
+        ExecutableImage asmImg = new SimpleAssembler().build(0x0600, asmLines).getExecImg();
         ExecutableImage hexImg = new HexDumpReader().read(hexLines);
         
         byte[] hexBytes = hexImg.joinAllSegments();

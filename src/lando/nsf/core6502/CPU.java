@@ -24,16 +24,20 @@ public final class CPU {
 	private int branchTaken;
 	private int branchedToNewPage;
 	
-	public int P  = 0;  
+	public int P  = 0b00_1_10000;   
 	public int PC = 0;
 	public int A  = 0;
 	public int X  = 0;
 	public int Y  = 0;
-	public int S  = 0; 
+	public int S  = 0xFF; 
 		
 	public CPU(Memory mem) {
 		Validate.notNull(mem);
 		this.mem = mem;
+	}
+	
+	public int stackAddr() {
+	    return STACK_START + (S&0xFF);
 	}
 	
 	public int step() {

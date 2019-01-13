@@ -1,5 +1,7 @@
 package lando.nsf;
 
+import org.apache.commons.lang3.Validate;
+
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
 
@@ -11,20 +13,27 @@ public final class DisassemblerUtils {
 			return "???";
 		}
 		
-		Instruction opInfo = Instructions.BY_OP_CODE[b1];
+		Instruction instr = Instructions.BY_OP_CODE[b1];
 		
-		if( opInfo == null ) {
+		if( instr == null ) {
 			return "???";
 		}
 		
-		String arg = "";
+		return opCodeText(instr, b2, b3);
+	}
+	
+	public static String opCodeText(Instruction instr, int b2, int b3) {
+		Validate.notNull(instr);
 		
-		switch(opInfo.addrMode.instrLen) {
-			case 2: arg = HexUtils.toHex8(b2); break;
-			case 3: arg = HexUtils.toHex16(b2 | (b3 << 8)); break;
+		String arg;
+		
+		switch(instr.addrMode.instrLen) {
+			case 2: arg = "$" + HexUtils.toHex8(b2); break;
+			case 3: arg = "$" + HexUtils.toHex16(b2 | (b3 << 8)); break;
+			default: arg = "";
 		}
 		
-		switch(opInfo.addrMode) {
+		switch(instr.addrMode) {
 			case IMMEDIATE   : arg = "#" + arg; break;
 			case ZERO_PAGE   : break;
 			case ZERO_PAGE_X : arg = arg + ",X"; break;
@@ -33,13 +42,13 @@ public final class DisassemblerUtils {
 			case ABSOLUTE_X  : arg = arg + ",X"; break;
 			case ABSOLUTE_Y  : arg = arg + ",Y"; break;
 			case INDIRECT_X  : arg = "(" + arg + ",X)"; break;
-			case INDIRECT_Y  : arg = "(" + arg + ",Y"; break; 
+			case INDIRECT_Y  : arg = "(" + arg + "),Y"; break; 
 			case ACCUMULATOR : arg = "A" + arg; break; 
 			case RELATIVE    : break; 
 			case IMPLIED     : break; 
 			case INDIRECT    : arg = "(" + arg + ")"; break;
 		}
 		
-		return opInfo.name + " " + arg;
+		return instr.name + " " + arg;
 	}
 }

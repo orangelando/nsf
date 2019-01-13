@@ -28,7 +28,7 @@ public final class HexDumpReader {
         int[] startAddress = {-1};
         int[] expectedNextAddress = {-1};
         
-        reader.read(lines, line -> {
+        reader.read(lines, (line, lineNum) -> {
             line = line.trim();
             
             if( line.isEmpty() ) {

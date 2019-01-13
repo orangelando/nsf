@@ -1,21 +1,14 @@
 package lando.nsf.core6502;
 
-import java.io.PrintStream;
+import static lando.nsf.core6502.TestRunner.runTest;
+
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.Test;
-
-import lando.nsf.ExecutableImage;
-import lando.nsf.assembler.SimpleAssembler;
 
 public class Easy6502CPUTests {
     
-    private final PrintStream out = System.err;
-
     @Test
     public void our_first_program() {
         runTest(
@@ -256,70 +249,4 @@ public class Easy6502CPUTests {
 
     }
     
-    private void runTest(
-            int startAddr,
-            int maxSteps,
-            List<String> lines,
-            ExpectedState endState) {
-        
-        SimpleAssembler assembler = new SimpleAssembler();
-        ExecutableImage exec = assembler.build(startAddr, lines);
-        ByteArrayMem mem = new ByteArrayMem();
-        
-        mem.load(exec);
-        
-        //add sentinal address in interrupt handler 
-        mem.write(0xFFFE, 0xFF);
-        mem.write(0xFFFF, 0xFF);
-        
-        CPU cpu = new CPU(mem);
-        
-        cpu.A  = 0;
-        cpu.X  = 0;
-        cpu.Y  = 0;
-        cpu.P  = 0b00110000;
-        cpu.PC = startAddr;
-        cpu.S  = 0xFF;
-
-        int numSteps = 0;
-        long numCycles = 0;
-        long startNanos = System.nanoTime();
-        
-        while(true) {
-            
-            numCycles += cpu.step();
-            numSteps++;
-            
-            StatusPrinter.printRegisters(cpu, mem);
-            
-            if( numSteps > maxSteps ) {
-                Assert.fail("max-steps exceeded");
-            }
-            
-            if( cpu.PC == 0xFFFF ) {
-                break;
-            }
-        }
-        
-        long endNanos = System.nanoTime();
-        long numNanos = endNanos - startNanos;
-        double mhz = (numCycles/1e6)/(numNanos/1e9);
-        
-        out.printf("mhz: %.2f%n", mhz);
-        
-        if( ! endState.registersMatch(cpu) ) {
-            Assert.fail("registers do not match: " + 
-                    endState.registersString() + " vs " + 
-                    ExpectedState.copyRegisters(cpu).registersString());
-        }
-        
-        List<DataDiff> memDiffs = endState.dataDiffs(mem);
-        
-        if( ! memDiffs.isEmpty() ) {
-            Assert.fail("memory diffs:\n" + 
-                    memDiffs.stream()
-                        .map(d -> d.toString())
-                        .collect(Collectors.joining("\n")));
-        }
-    }    
 }

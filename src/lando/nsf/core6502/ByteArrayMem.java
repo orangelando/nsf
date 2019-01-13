@@ -16,6 +16,7 @@ public final class ByteArrayMem implements Memory {
     @Override
     public void write(int addr, int data) {
         bytes[addr & 0xFFFF] = (byte)data;
+        //System.err.printf("mem[%x] <- %x%n", addr, data);
     }
     
     public void load(ExecutableImage execImg) {
