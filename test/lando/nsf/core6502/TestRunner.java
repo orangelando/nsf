@@ -42,12 +42,16 @@ final class TestRunner {
         long numCycles = 0;
         long startNanos = System.nanoTime();
         
+        boolean verbose = "true".equals(System.getProperty("lando.nsf.core6502.verbose"));
+        
         while(true) {
             
             numCycles += cpu.step();
             numSteps++;
             
-            StatusPrinter.printRegisters(cpu, mem);
+            if( verbose ) {
+                StatusPrinter.printRegisters(cpu, mem);
+            }
             
             if( numSteps > maxSteps ) {
                 Assert.fail("max-steps exceeded");
@@ -60,9 +64,11 @@ final class TestRunner {
         
         long endNanos = System.nanoTime();
         long numNanos = endNanos - startNanos;
-        double mhz = (numCycles/1e6)/(numNanos/1e9);
         
-        out.printf("mhz: %.2f%n", mhz);
+        if( verbose ) {
+            double mhz = (numCycles/1e6)/(numNanos/1e9);
+            out.printf("mhz: %.2f%n", mhz);
+        }
         
         if( ! endState.registersMatch(cpu) ) {
             Assert.fail("registers do not match: " + 
@@ -78,6 +84,5 @@ final class TestRunner {
                         .map(d -> d.toString())
                         .collect(Collectors.joining("\n")));
         }
-    }    
-
+    }
 }

@@ -73,6 +73,29 @@ final class ExpectedState {
                 mem);
     }
     
+    static ExpectedState accumAndMem(int accum, int ... addrDataPairs) {
+        return new ExpectedState(
+                Optional.of(accum),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                toMem(addrDataPairs));
+    }
+    
+    static ExpectedState statusFlags(int status) {
+        return new ExpectedState(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(status),
+                new TreeMap<>());
+    }
+
+    
     static ExpectedState of(
             Optional<Integer> accumulator, 
             Optional<Integer> xIndex, 

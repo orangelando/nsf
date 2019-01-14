@@ -1,5 +1,6 @@
 package lando.nsf.snakes;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,33 +61,53 @@ public final class Easy6502SnakesApp {
         mainFrame.addKeyListener(kb);
         
         mainFrame         .setLocation(   0,   0);
-        dissassemblerFrame.setLocation( 500,   0);
-        zeroPageFrame     .setLocation(1000,   0);
-        stackPageFrame    .setLocation(   0, 520);
-        pixelsPageFrame   .setLocation( 500, 520);
+        dissassemblerFrame.setLocation( 510,   0);
+        zeroPageFrame     .setLocation(1020,   0);
+        stackPageFrame    .setLocation(   0, 550);
+        pixelsPageFrame   .setLocation( 510, 550);
         
-        pixelsPageFrame.setSize(1000, 1000);
+        zeroPageFrame.setSize(385, 385);
+        stackPageFrame.setSize(385, 385);
+        pixelsPageFrame.setSize(750, 750);
+        
+        //long prevTime = System.currentTimeMillis();
         
         while(mainFrame.isVisible()) {
             
             List<Character> keysPressed = kb.drainKeyQueue();
             
-            if( keysPressed.contains('q') || keysPressed.contains('Q') ) {
-            
-                rnd.setRandByte();
-                monitoringMem.clearReadsAndWrites();
-                cpu.step();
-                numInstrs.incrementAndGet();
+            //if( keysPressed.contains('q') || keysPressed.contains('Q') || 
+            //    keysPressed.contains('z') || keysPressed.contains('Z')) {
                 
-                dissassemblerTxt.updateTxt();
-                zeroPageTxt.updateTxt();
-                stackPageTxt.updateTxt();
-                pixelsPageTxt.updateTxt();
+                int numSteps = keysPressed.contains('z') || keysPressed.contains('Z') 
+                        ? 100 : 1;
+            
+                for(int i = 0; i < 100; i++) {
+                    rnd.setRandByte();
+                    monitoringMem.clearReadsAndWrites();
+                    cpu.step();
+                    numInstrs.incrementAndGet();
+                }
+                
+                //dissassemblerTxt.updateTxt();
+                //zeroPageTxt.updateTxt();
+                //stackPageTxt.updateTxt();
+                //pixelsPageTxt.updateTxt();
                 
                 pixels.repaint();
+            //}
+            
+            /*
+            long currTime = System.currentTimeMillis();
+            
+            if( prevTime/1000 != currTime/1000 ) {
+                System.err.println(numInstrs.get());
             }
             
-            Thread.sleep(15);
+            prevTime = currTime;
+            */
+            
+            Thread.sleep(10);
         }
     }
     

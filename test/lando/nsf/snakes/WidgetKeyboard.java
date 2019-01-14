@@ -24,7 +24,9 @@ final class WidgetKeyboard extends KeyAdapter {
     public void keyTyped(KeyEvent e) {
         char c = e.getKeyChar();
         
-        mem.bytes[SYS_LAST_KEY_ADDR] = (byte)c;
+        if( ! e.isShiftDown() ) {
+            mem.bytes[SYS_LAST_KEY_ADDR] = (byte)c;
+        }
         
         keyQueue.add(c);
         

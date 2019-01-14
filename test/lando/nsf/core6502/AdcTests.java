@@ -3,12 +3,12 @@ package lando.nsf.core6502;
 import static lando.nsf.core6502.TestRunner.runTest;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Test;
 
-public class AdcAndAddressingModeTests {
+public class AdcTests {
 
-    
     @Test
     public void adc_immediate() {
         runTest(
@@ -179,9 +179,43 @@ public class AdcAndAddressingModeTests {
                         0x3102, 0xbc,
                         0x0200, 0xbd));
     }
-
-
-
-
+    
+    @Test
+    public void neg_and_overflow() {
+        runTest(
+            0x0600,
+            100,
+            Arrays.asList(
+                "LDA #$7f",
+                "ADC #$03",
+                "BRK"),
+            ExpectedState.onlyRegisters(
+                Optional.of(0x82),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(CPU.START_STATUS | CPU.STATUS_N | CPU.STATUS_O)
+                ));
+    }
+    
+    @Test
+    public void carry() {
+        runTest(
+            0x0600,
+            100,
+            Arrays.asList(
+                "LDA #$ff",
+                "ADC #$ff",
+                "BRK"),
+            ExpectedState.onlyRegisters(
+                Optional.of(0xfe),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(CPU.START_STATUS | CPU.STATUS_N | CPU.STATUS_C)
+                ));
+    }
 
 }
