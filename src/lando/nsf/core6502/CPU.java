@@ -8,6 +8,8 @@ public final class CPU {
         SET, CLEAR
     }
     
+    public static final int START_STATUS = 0b00_1_10000;
+    
 	public static final int STATUS_C = 0x01;
 	public static final int STATUS_Z = 0x02;
 	public static final int STATUS_I = 0x04;
@@ -24,7 +26,7 @@ public final class CPU {
 	private int branchTaken;
 	private int branchedToNewPage;
 	
-	public int P  = 0b00_1_10000;   
+	public int P  = START_STATUS; 
 	public int PC = 0;
 	public int A  = 0;
 	public int X  = 0;
@@ -145,7 +147,7 @@ public final class CPU {
 			case 0xC6: dec(readZeroPageAddr());  cycles = 5; break;
 			case 0xD6: dec(readZeroPageXAddr()); cycles = 6; break;
 			case 0xCE: dec(readAbsoluteAddr());  cycles = 6; break;
-			case 0xDE: dec(readAbsoluteX());     cycles = 7; break;
+			case 0xDE: dec(readAbsoluteXAddr());     cycles = 7; break;
 			
 			//DEX
 			case 0xCA: dex(); cycles = 2; break;
@@ -167,7 +169,7 @@ public final class CPU {
 			case 0xE6: inc(readZeroPageAddr());  cycles = 5; break;
 			case 0xF6: inc(readZeroPageXAddr()); cycles = 6; break;
 			case 0xEE: inc(readAbsoluteAddr());  cycles = 6; break;
-			case 0xFE: inc(readAbsoluteX());     cycles = 7; break;
+			case 0xFE: inc(readAbsoluteXAddr()); cycles = 7; break;
 			
 			//INX
 			case 0xE8: inx(); cycles = 2; break;
@@ -283,8 +285,8 @@ public final class CPU {
 			case 0x8D: sta(readAbsoluteAddr());     cycles = 4; break;
 			case 0x9D: sta(readAbsoluteXAddr());    cycles = 5; break;
 			case 0x99: sta(readAbsoluteYAddr());    cycles = 5; break;
-			case 0x81: sta(readIndexedIndirectX()); cycles = 6; break;
-			case 0x91: sta(readIndirectIndexedY()); cycles = 6; break;
+			case 0x81: sta(readIndexedIndirectXAddr()); cycles = 6; break;
+			case 0x91: sta(readIndirectIndexedYAddr()); cycles = 6; break;
 			
 			//STX
 			case 0x86: stx(readZeroPageAddr());      cycles = 3; break;
@@ -476,7 +478,7 @@ public final class CPU {
 	}
 	
 	private void setZN(int n) {
-		setStatus( n == 0, STATUS_Z);
+		setStatus( (n & 0xFF) == 0, STATUS_Z);
 		setStatus( (n & 0x80) != 0, STATUS_N);
 	}
 	
@@ -511,14 +513,39 @@ public final class CPU {
 		if( (P & STATUS_D) != 0 ) {
 			throw new IllegalStateException("Decimal flag not supported");
 		}
-		int oldSign = A & 0x80;
+		
+		//not sure why this all works
+		boolean overflow = ((A^M) & 0x80) != 0;
+        setStatus( overflow, STATUS_O);
+		
 		int C = (P & STATUS_C) != 0 ? 1 : 0;
+		
+		int w = 0xFF + A - M + C;
+		
+		if( w < 0x100 ) {
+		    setStatus(false, STATUS_C);
+		    
+		    if( overflow && w < 0x80 ) {
+		        setStatus(false, STATUS_O);
+		    }
+		} else {
+		    setStatus(true, STATUS_C);
+		    
+		    if( overflow && w >= 0x180 ) {
+		        setStatus(false, STATUS_O);
+		    }
+		}
+		
+		/*
 		A = A - M - (1 - C);
-		int newSign = A & 0x80;
 		setZN(A);
-		setStatus( (A & 0x100) != 0, STATUS_C);
-		setStatus( oldSign != newSign, STATUS_O);
+		
+		//see page 14 of the MOS programming mannual
+		setStatus( (A&255) >= 0 && (A&255) <= 127, STATUS_C);
 		A &= 0xFF;
+		*/
+		A = w & 0xFF;
+		setZN(A);
 	}
 	
 	private void aslAcc() {
