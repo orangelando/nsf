@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf.core6502.instructions;
 
 import static lando.nsf.core6502.TestRunner.runTest;
 
@@ -6,141 +6,117 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public class LdaTests {
+import lando.nsf.core6502.ExpectedState;
 
-    @Test
-    public void lda_immediate() {
-        runTest(
-                0x0600,
-                100,
-                Arrays.asList(
-                    "LDA #$10",
-                    "BRK"),
-                ExpectedState.accumAndMem(0x10));
-    }
+public class StaTests {
     
     @Test
-    public void lda_zero_page() {
+    public void sta_zero_page() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
                     "LDA #$10",
                     "STA $08",
-                    "LDA #$00",
-                    "LDA $08",
                     "BRK"),
-                ExpectedState.accumAndMem(0x10,
+                ExpectedState.onlyMem(
                         0x0008, 0x10));
     }
     
     @Test
-    public void lda_zero_page_x() {
+    public void sta_zero_page_x() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
                     "LDA #$10",
-                    "STA $7f",
-                    "LDA #$00",
                     "LDX #$80",
-                    "LDA $ff,X",
+                    "STA $ff,X",
                     "BRK"),
-                ExpectedState.accumAndMem(0x10,
+                ExpectedState.onlyMem(
                         0x007f, 0x10));
     }
     
     @Test
-    public void lda_absolute() {
+    public void sta_absolute() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
-                    "LDA #$02",
+                    "LDA #$10",
                     "STA $0345",
-                    "LDA #$00",
-                    "LDA $0345",
                     "BRK"),
-                ExpectedState.accumAndMem(0x02,
-                        0x0345, 0x02));
+                ExpectedState.onlyMem(
+                        0x0345, 0x10));
     }
     
     @Test
-    public void lda_absolute_x() {
+    public void sta_absolute_x() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
                     "LDA #$10",
-                    "STA $3102",
                     "LDX #$01",
-                    "LDA #$00",
-                    "LDA $3101,X",
+                    "STA $3101,X",
                     "BRK"),
-                ExpectedState.accumAndMem(0x10,
+                ExpectedState.onlyMem(
                         0x3102, 0x10));
     }
     
     @Test
-    public void lda_absolute_y() {
+    public void sta_absolute_y() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
                     "LDA #$10",
-                    "STA $3102",
                     "LDY #$01",
-                    "LDA #$00",
-                    "LDA $3101,Y",
+                    "STA $3101,Y",
                     "BRK"),
-                ExpectedState.accumAndMem(0x10,
+                ExpectedState.onlyMem(
                         0x3102, 0x10));
     }
     
     @Test
-    public void lda_indexed_indirect_x() {
+    public void sta_indexed_indirect_x() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
-                    "LDA #$bc",
-                    "STA $3102",
                     
                     "LDA #$02",
                     "STA $10",
                     "LDA #$31",
                     "STA $11",
                     
-                    "LDA #$00",
+                    "LDA #$bc",
                     "LDX #$30",
-                    "LDA ($e0,X)",
+                    "STA ($e0,X)",
                     "BRK"),
-                ExpectedState.accumAndMem(0xbc,
+                ExpectedState.onlyMem(
                         0x0010, 0x02,
                         0x0011, 0x31,
-                        
                         0x3102, 0xbc));
     }
     
     @Test
-    public void lda_indirect_indexed_y() {
+    public void sta_indirect_indexed_y() {
         runTest(
                 0x0600,
                 100,
                 Arrays.asList(
-                    "LDA #$bc",
-                    "STA $3102",
                     
                     "LDA #$01",
                     "STA $10",
                     "LDA #$31",
                     "STA $11",
                     
-                    "LDA #$00",
+                    "LDA #$bc",
                     "LDY #$01",
-                    "LDA ($10),Y",
+                    "STA ($10),Y",
                     "BRK"),
-                ExpectedState.accumAndMem(0xbc,
+                ExpectedState.onlyMem(
                         0x0010, 0x01,
                         0x0011, 0x31,
                         

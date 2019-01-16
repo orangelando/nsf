@@ -1,10 +1,13 @@
-package lando.nsf.core6502;
+package lando.nsf.core6502.instructions;
 
 import static lando.nsf.core6502.TestRunner.runTest;
 
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import lando.nsf.core6502.CPU;
+import lando.nsf.core6502.ExpectedState;
 
 public class BitTests {
 

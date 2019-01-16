@@ -9,11 +9,11 @@ import org.junit.Assert;
 import lando.nsf.ExecutableImage;
 import lando.nsf.assembler.SimpleAssembler;
 
-final class TestRunner {
+public final class TestRunner {
     
     private static final PrintStream out = System.err;
 
-    static void runTest(
+    public static void runTest(
             int startAddr,
             int maxSteps,
             List<String> lines,

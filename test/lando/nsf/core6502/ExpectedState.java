@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
 
-final class ExpectedState {
+public final class ExpectedState {
     
     private static Map<Integer, Integer> toMem(int ... addrDataPairs) {
         Validate.notNull(addrDataPairs);
@@ -26,7 +26,7 @@ final class ExpectedState {
         return mem;
     }
     
-    static ExpectedState copyRegisters(CPU cpu) {
+    public static ExpectedState copyRegisters(CPU cpu) {
         Validate.notNull(cpu);
         
         Map<Integer, Integer> mem = new TreeMap<>();
@@ -41,7 +41,7 @@ final class ExpectedState {
                 mem);
     }
     
-    static ExpectedState onlyMem(int ... addrDataPairs) {
+    public static ExpectedState onlyMem(int ... addrDataPairs) {
         return new ExpectedState(
                 Optional.empty(),
                 Optional.empty(),
@@ -52,7 +52,7 @@ final class ExpectedState {
                 toMem(addrDataPairs));
     }
     
-    static ExpectedState onlyRegisters(
+    public static ExpectedState onlyRegisters(
             Optional<Integer> accumulator, 
             Optional<Integer> xIndex, 
             Optional<Integer> yIndex,
@@ -73,7 +73,7 @@ final class ExpectedState {
                 mem);
     }
     
-    static ExpectedState accumAndMem(int accum, int ... addrDataPairs) {
+    public static ExpectedState accumAndMem(int accum, int ... addrDataPairs) {
         return new ExpectedState(
                 Optional.of(accum),
                 Optional.empty(),
@@ -84,7 +84,7 @@ final class ExpectedState {
                 toMem(addrDataPairs));
     }
     
-    static ExpectedState statusFlags(int status) {
+    public static ExpectedState statusFlags(int status) {
         return new ExpectedState(
                 Optional.empty(),
                 Optional.empty(),
@@ -96,7 +96,7 @@ final class ExpectedState {
     }
 
     
-    static ExpectedState of(
+    public static ExpectedState of(
             Optional<Integer> accumulator, 
             Optional<Integer> xIndex, 
             Optional<Integer> yIndex,
@@ -116,7 +116,7 @@ final class ExpectedState {
                 toMem(addrDataPairs));
     }
     
-    static ExpectedState empty() {
+    public static ExpectedState empty() {
         
         Map<Integer, Integer> mem = new TreeMap<>();
         
