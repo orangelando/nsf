@@ -491,9 +491,11 @@ public final class CPU {
 	}
 	
 	private void adc(int M) {
+	    
 		if( (P & STATUS_D) != 0 ) {
 			throw new IllegalStateException("Decimal flag not supported");
 		}
+		
 		int oldSign = A & 0x80;
 		int C = (P & STATUS_C) != 0 ? 1 : 0;
 		A = A + M + C;
@@ -510,42 +512,19 @@ public final class CPU {
 	}
 	
 	private void sbc(int M) {
+	    
 		if( (P & STATUS_D) != 0 ) {
 			throw new IllegalStateException("Decimal flag not supported");
 		}
 		
-		//not sure why this all works
-		boolean overflow = ((A^M) & 0x80) != 0;
-        setStatus( overflow, STATUS_O);
-		
+        int oldSign = A & 0x80;
 		int C = (P & STATUS_C) != 0 ? 1 : 0;
-		
-		int w = 0xFF + A - M + C;
-		
-		if( w < 0x100 ) {
-		    setStatus(false, STATUS_C);
-		    
-		    if( overflow && w < 0x80 ) {
-		        setStatus(false, STATUS_O);
-		    }
-		} else {
-		    setStatus(true, STATUS_C);
-		    
-		    if( overflow && w >= 0x180 ) {
-		        setStatus(false, STATUS_O);
-		    }
-		}
-		
-		/*
-		A = A - M - (1 - C);
+		A = A + ((~M + C) & 0xFF);
+		int newSign = A & 0x80;
 		setZN(A);
-		
-		//see page 14 of the MOS programming mannual
-		setStatus( (A&255) >= 0 && (A&255) <= 127, STATUS_C);
-		A &= 0xFF;
-		*/
-		A = w & 0xFF;
-		setZN(A);
+        setStatus( (A & 0x100) != 0, STATUS_C);
+	    setStatus( oldSign != newSign, STATUS_O);
+	    A &= 0xFF;
 	}
 	
 	private void aslAcc() {
