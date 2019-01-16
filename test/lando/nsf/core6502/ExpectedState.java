@@ -84,6 +84,41 @@ public final class ExpectedState {
                 toMem(addrDataPairs));
     }
     
+    public static ExpectedState onlyA(int accum) {
+        return new ExpectedState(
+                Optional.of(accum),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                new TreeMap<>());
+    }
+    
+    public static ExpectedState accumAndStatus(int accum, int status) {
+        return new ExpectedState(
+                Optional.of(accum),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(status),
+                new TreeMap<>());
+    }
+    
+    public static ExpectedState statusAndMem(int status, int ... addrDataPairs) {
+        return new ExpectedState(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(status),
+                toMem(addrDataPairs));
+    }
+
+
+    
     public static ExpectedState statusFlags(int status) {
         return new ExpectedState(
                 Optional.empty(),
@@ -94,7 +129,28 @@ public final class ExpectedState {
                 Optional.of(status),
                 new TreeMap<>());
     }
-
+    
+    public static ExpectedState onlyX(int x) {
+        return new ExpectedState(
+                Optional.empty(),
+                Optional.of(x),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                new TreeMap<>());
+    }
+    
+    public static ExpectedState onlyY(int y) {
+        return new ExpectedState(
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of(y),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                new TreeMap<>());
+    }
     
     public static ExpectedState of(
             Optional<Integer> accumulator, 
