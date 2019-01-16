@@ -1,5 +1,8 @@
 package lando.nsf;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.lang3.Validate;
 
 final class DataReader {
@@ -26,18 +29,18 @@ final class DataReader {
 	}
 	
 	String readString(int offset, int maxLen) {
-		StringBuilder sb = new StringBuilder();
+	    int len;
 		
-		for(int i = 0; i < maxLen; i++) {
-			char c = (char)bytes[offset + i];
+		for(len = 0; len < maxLen; len++) {
+			byte b = bytes[offset + len];
 			
-			if( c == '\0') {
+			if( b == 0 ) {
 				break;
 			}
-			
-			sb.append(c);
 		}
 		
-		return sb.toString();
+		Charset cs = StandardCharsets.US_ASCII;
+		
+		return new String(bytes, offset, len, cs);
 	}
 }

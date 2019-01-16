@@ -110,7 +110,7 @@ public final class CpuTestApp {
 			private void go() throws Exception {
 				System.err.println("Starting playing thread");
 				
-				long millionths = nsf.isNSTC() ? nsf.header.ntscSpeed : nsf.header.palSpeed;
+				long millionths = nsf.isNTSC() ? nsf.header.ntscSpeed : nsf.header.palSpeed;
 				Validate.isTrue(millionths > 0);
 				
 				long nanos = millionths*1000;
@@ -191,7 +191,7 @@ public final class CpuTestApp {
 		}
 		
 		cpu.A = songNum;
-		cpu.X = nsf.isNSTC() ? 0 : 1;
+		cpu.X = nsf.isNTSC() ? 0 : 1;
 		cpu.PC = nsf.header.initDataAddr;
 		
 		long start = System.nanoTime();

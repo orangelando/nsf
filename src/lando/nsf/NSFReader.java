@@ -6,8 +6,6 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 public final class NSFReader {
 
@@ -17,43 +15,41 @@ public final class NSFReader {
 	 * http://kevtris.org/nes/nsfspec.txt
 	 */
     public static NSF readNSF(File file) throws Exception {
-		byte[] bytes = FileUtils.readFileToByteArray(file);
+        byte[] bytes = FileUtils.readFileToByteArray(file);
+        return readNSF(bytes);
+    }
+    
+    public static NSF readNSF(byte[] bytes) {
+        
 		NSFHeader header = new NSFHeader();
+		DataReader reader = new DataReader(bytes);
+	
+		reader.copy(0, header.nesm, 0, 5);
+		header.versionNumber = reader.readByte(0x5);
 		
-		try {
-			
-			DataReader reader = new DataReader(bytes);
+		Validate.isTrue( equals(header.nesm, 0, NESM, 0, 5) );
+		//Validate.isTrue( header.versionNumber == 1 );
 		
-			reader.copy(0, header.nesm, 0, 5);
-			header.versionNumber = reader.readByte(0x5);
-			
-			Validate.isTrue( equals(header.nesm, 0, NESM, 0, 5) );
-			Validate.isTrue( header.versionNumber == 1 );
-			
-			header.totalSongs   = reader.readByte(0x6);
-			header.startingSong = reader.readByte(0x7);
-			header.loadDataAddr  = reader.readWord(0x8);
-			header.initDataAddr  = reader.readWord(0xA);
-			header.playDataAddr  = reader.readWord(0xC);
-			header.songName        = reader.readString(0x0E, 32);
-			header.artistName      = reader.readString(0x2E, 32);
-			header.copyrightHolder = reader.readString(0x4E, 32);
-			header.ntscSpeed       = reader.readWord(0x6E);
-			
-			for(int i = 0; i < 8; i++) {
-				header.bankswitchInitValues[i] = 
-						reader.readByte(0x70 + i);
-			}
-			
-			header.palSpeed        = reader.readWord(0x78);
-			header.palNtscBits     = reader.readByte(0x7A);
-			header.extraSoungChipSupport = reader.readByte(0x7B);
-			
-			return new NSF(header, bytes);
+		header.totalSongs      = reader.readByte(0x6);
+		header.startingSong    = reader.readByte(0x7);
+		header.loadDataAddr    = reader.readWord(0x8);
+		header.initDataAddr    = reader.readWord(0xA);
+		header.playDataAddr    = reader.readWord(0xC);
+		header.songName        = reader.readString(0x0E, 32);
+		header.artistName      = reader.readString(0x2E, 32);
+		header.copyrightHolder = reader.readString(0x4E, 32);
+		header.ntscSpeed       = reader.readWord(0x6E);
 		
-		} finally {
-			System.err.println(ToStringBuilder.reflectionToString(header, ToStringStyle.MULTI_LINE_STYLE));
+		for(int i = 0; i < 8; i++) {
+			header.bankswitchInitValues[i] = 
+					reader.readByte(0x70 + i);
 		}
+		
+		header.palSpeed        = reader.readWord(0x78);
+		header.palNtscBits     = reader.readByte(0x7A);
+		header.extraSoundChipSupport = reader.readByte(0x7B);
+		
+		return new NSF(header, bytes);
 	}
 	
     public static void load(NSF nsf, NESMem mem) {

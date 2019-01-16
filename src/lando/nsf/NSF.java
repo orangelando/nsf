@@ -19,7 +19,7 @@ public final class NSF {
 		return false;
 	}
 	
-    public boolean isNSTC() {
+    public boolean isNTSC() {
 		return (header.palNtscBits & 1) == 0;
 	}
 }

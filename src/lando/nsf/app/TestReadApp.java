@@ -29,7 +29,7 @@ public class TestReadApp {
 		CPU cpu = new CPU(mem);
 		NSF nsf = NSFReader.readNSF(file);
 		
-		if( nsf.header.extraSoungChipSupport != 0 ) {
+		if( nsf.header.extraSoundChipSupport != 0 ) {
 			throw new IllegalArgumentException("Extra sound chips not supported.");
 		}
 		
