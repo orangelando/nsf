@@ -9,6 +9,10 @@ public final class CPU {
     }
     
     public static final int START_STATUS = 0b00_1_10000;
+
+    public static final int NMI_VECTOR_ADDR   = 0xFF_FA;
+    public static final int RESET_VECTOR_ADDR = 0xFF_FC;
+    public static final int IRQ_VECTOR_ADDR   = 0xFF_FE;
     
 	public static final int STATUS_C = 0x01;
 	public static final int STATUS_Z = 0x02;
@@ -332,7 +336,7 @@ public final class CPU {
 		return mem.read(STACK_START + ((++S) & 0xFF));
 	}
 	
-	private void pushAddr(int addr) {
+	public void pushAddr(int addr) {
 		int adh = (addr >> 8) & 0xFF;
 		int adl = addr & 0xFF;
 		push(adh);

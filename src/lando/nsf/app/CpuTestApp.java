@@ -2,7 +2,6 @@ package lando.nsf.app;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,22 +14,28 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import lando.nsf.*;
+import org.apache.commons.lang3.Validate;
+
+import lando.nsf.APU;
+import lando.nsf.DisassemblerUtils;
+import lando.nsf.HexUtils;
+import lando.nsf.NESMem;
+import lando.nsf.NSF;
+import lando.nsf.NSFReader;
 import lando.nsf.core6502.CPU;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
 
-import org.apache.commons.lang3.Validate;
-
 public final class CpuTestApp {
 	
 	public static void main(String [] args) throws Exception {
-		final File    file = new File("/Users/oroman/Downloads/super-mario-bros-2-nes-[NSF-ID1934].nsf");
-		final NESMem mem = new NESMem();
+		final File file = new File("/Users/oroman/Downloads/super-mario-bros-2-nes-[NSF-ID1934].nsf");
+		final APU apu = new APU();
+		final NESMem mem = new NESMem(apu);
 		final NSF nsf = NSFReader.readNSF(file);
 		final CPU cpu = new CPU(mem);
 		
-		NSFReader.load(nsf, mem);
+		//NSFReader.load(nsf, mem);
 		
 		final int[] songNum = {0};
 		final boolean done[] = {false};

@@ -1,4 +1,4 @@
-package lando.nsf.snakes;
+package lando.nsf.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,24 +7,24 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
-final class TextLine {
+public final class TextLine {
 
     private final String line;
     private final List<LineSection> highlightedSections = new ArrayList<>();
     
-    TextLine(String line) {
+    public TextLine(String line) {
         this.line = Objects.requireNonNull(line);
     }
     
-    String getLine() {
+    public String getLine() {
         return line;
     }
     
-    List<LineSection> getHighlightedSections() {
+    public List<LineSection> getHighlightedSections() {
         return Collections.unmodifiableList(highlightedSections);
     }
     
-    void addHighlightedSection(LineSection sect) {
+    public void addHighlightedSection(LineSection sect) {
         Validate.notNull(sect);
         Validate.isTrue(sect.start + sect.length <= line.length(), 
                 "section going beyond end of line: " + 

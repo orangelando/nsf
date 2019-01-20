@@ -1,4 +1,4 @@
-package lando.nsf.snakes;
+package lando.nsf.gui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.Validate;
 import lando.nsf.HexUtils;
 import lando.nsf.core6502.CPU;
 
-final class MemoryMonitor {
+public final class MemoryMonitor {
     
     static final int STATUS_STACK = 1<<0;
     static final int STATUS_DIFF  = 1<<1;
@@ -28,7 +28,7 @@ final class MemoryMonitor {
     private int[] prevBytes;
     private int[] currBytes;
     
-    MemoryMonitor(int startAddr, int size, int numCols, CPU cpu, MonitoringMem mem) {
+    public MemoryMonitor(int startAddr, int size, int numCols, CPU cpu, MonitoringMem mem) {
         Validate.isTrue(size > 0);
         Validate.isTrue(startAddr >= 0 && startAddr + size <= MAX_SIZE);
         Validate.isTrue(numCols > 0 && numCols <= size);
@@ -43,7 +43,7 @@ final class MemoryMonitor {
         this.mem = Objects.requireNonNull(mem);
     }
     
-    List<TextLine> memData() {
+    public List<TextLine> memData() {
         
         copyAndSwapBufs();
         

@@ -1,4 +1,4 @@
-package lando.nsf.snakes;
+package lando.nsf.gui;
 
 import static lando.nsf.DisassemblerUtils.opCodeText;
 import static lando.nsf.core6502.StringUtils.toBin8;
@@ -21,19 +21,19 @@ import lando.nsf.core6502.CPU;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
 
-final class Dissassembler {
+public final class Dissassembler {
 
     private final CPU cpu;
-    private final ByteArrayMem mem;
+    private final Supplier<byte[]> mem;
     private final List<String> asm;
     private final AtomicInteger numInstrs;
     private final TreeMap<Integer, Integer> addrsToLines;
     private final TreeMap<Integer, Integer> linesToAddrs;
     private final Map<Integer, String> addrsToLabels;
     
-    Dissassembler(
+    public Dissassembler(
             CPU cpu, 
-            ByteArrayMem mem, 
+            Supplier<byte[]> mem, 
             List<String> asm, 
             AtomicInteger numInstrs,
             TreeMap<Integer, Integer> addrsToLines, 
@@ -58,7 +58,7 @@ final class Dissassembler {
                             e -> e.getKey()));
     }
     
-    List<TextLine> currStatus() {
+    public List<TextLine> currStatus() {
         List<TextLine> lines = new ArrayList<>();
         
         lines.add(new TextLine("num-instrs=" + numInstrs.get()));
@@ -83,16 +83,18 @@ final class Dissassembler {
         int addr = getPrintStartAddr();
         int numInstrsToPrint = 10;
         AtomicInteger pc = new AtomicInteger(addr);
-        Supplier<Byte> nextByte = () -> mem.bytes[pc.getAndIncrement()];
+        Supplier<Byte> nextByte = () -> mem.get()[pc.getAndIncrement()];
         
         for(int i = 0; i < numInstrsToPrint; i++) {
             
-            if( addrsToLabels.containsKey(pc.get())) {
-                lines.add(new TextLine(""));
-                lines.add(new TextLine(addrsToLabels.get(pc.get()) + ":"));
+            if( pc.get() < mem.get().length ) {
+                if( addrsToLabels.containsKey(pc.get())) {
+                    lines.add(new TextLine(""));
+                    lines.add(new TextLine(addrsToLabels.get(pc.get()) + ":"));
+                }
+                
+                lines.add(dissassemble(pc.get(), nextByte));
             }
-            
-            lines.add(dissassemble(pc.get(), nextByte));
         }
     }
     
@@ -203,5 +205,4 @@ final class Dissassembler {
             sb.append(s);
         }
     }
-
 }

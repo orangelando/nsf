@@ -1,4 +1,4 @@
-package lando.nsf.snakes;
+package lando.nsf.gui;
 
 import java.awt.Font;
 import java.util.List;
@@ -8,12 +8,12 @@ import java.util.function.Supplier;
 import javax.swing.JTextArea;
 
 @SuppressWarnings("serial")
-final class TextLines extends JTextArea {
+public final class TextLines extends JTextArea {
     
     private final Supplier<List<TextLine>> linesFn;
     private final TextLinesRenderer renderer;
     
-    TextLines(Supplier<List<TextLine>> linesFn) {
+    public TextLines(Supplier<List<TextLine>> linesFn) {
         super(80, 20);
         
         this.linesFn = Objects.requireNonNull(linesFn);
@@ -23,7 +23,7 @@ final class TextLines extends JTextArea {
         this.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
     }
     
-    void updateTxt() throws Exception {
+    public void updateTxt() throws Exception {
         
         List<TextLine> lines = linesFn.get();
         renderer.render(lines);

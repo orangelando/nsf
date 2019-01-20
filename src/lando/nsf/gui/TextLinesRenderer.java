@@ -1,4 +1,4 @@
-package lando.nsf.snakes;
+package lando.nsf.gui;
 
 import java.awt.Color;
 import java.util.List;

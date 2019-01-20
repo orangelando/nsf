@@ -1,19 +1,18 @@
 package lando.nsf.app;
 
-import static lando.nsf.HexUtils.*;
+import static lando.nsf.HexUtils.toHex16;
+import static lando.nsf.HexUtils.toHex8;
 
 import java.io.File;
 import java.util.Arrays;
 
-import lando.nsf.*;
+import lando.nsf.APU;
+import lando.nsf.NESMem;
+import lando.nsf.NSF;
+import lando.nsf.NSFReader;
 import lando.nsf.core6502.CPU;
 import lando.nsf.core6502.Instruction;
 import lando.nsf.core6502.Instructions;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class TestReadApp {
 
@@ -25,7 +24,8 @@ public class TestReadApp {
 				//"/Users/oroman/Downloads/Metroid.nsf"
 				);
 		
-		NESMem mem = new NESMem();
+	    APU apu = new APU();
+		NESMem mem = new NESMem(apu);
 		CPU cpu = new CPU(mem);
 		NSF nsf = NSFReader.readNSF(file);
 		

@@ -13,6 +13,10 @@ import lando.nsf.assembler.Easy6502TestName;
 import lando.nsf.assembler.SimpleAssembler;
 import lando.nsf.core6502.ByteArrayMem;
 import lando.nsf.core6502.CPU;
+import lando.nsf.gui.Dissassembler;
+import lando.nsf.gui.MemoryMonitor;
+import lando.nsf.gui.MonitoringMem;
+import lando.nsf.gui.TextLines;
 
 public final class Easy6502SnakesApp {
     
@@ -33,7 +37,10 @@ public final class Easy6502SnakesApp {
         
         AtomicInteger numInstrs = new AtomicInteger(0);
 
-        Dissassembler dissassembler = new Dissassembler(cpu, mem, asm, 
+        Dissassembler dissassembler = new Dissassembler(
+                cpu, 
+                () -> mem.bytes, 
+                asm, 
                 numInstrs,
                 assr.getAddrsToLineNums(),
                 assr.getAddressLabels());
@@ -41,7 +48,7 @@ public final class Easy6502SnakesApp {
         MemoryMonitor zeroPage   = new MemoryMonitor(0, 256, 16, cpu, monitoringMem);
         MemoryMonitor stackPage  = new MemoryMonitor(CPU.STACK_START, 256, 16, cpu, monitoringMem);
         MemoryMonitor pixelsPage = new MemoryMonitor(0x0200, 32*32, 32, cpu, monitoringMem);
-        
+                
         TextLines dissassemblerTxt = new TextLines(dissassembler::currStatus);
         TextLines zeroPageTxt      = new TextLines(zeroPage::memData);
         TextLines stackPageTxt     = new TextLines(stackPage::memData);
