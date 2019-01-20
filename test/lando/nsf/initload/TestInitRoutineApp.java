@@ -31,7 +31,7 @@ public final class TestInitRoutineApp {
         nes.initTune(songIndex);
         
          
-        nes.startInit(CPU.RESET_VECTOR_ADDR);
+        nes.startInit();
         RunState runState = RunState.INIT;
         
         AtomicInteger numInstrs = new AtomicInteger(0);
@@ -93,7 +93,7 @@ public final class TestInitRoutineApp {
                 switch(runState) {
                 case INIT:
                     if( nes.cpu.PC == CPU.RESET_VECTOR_ADDR ) {
-                        nes.startPlay(CPU.RESET_VECTOR_ADDR);
+                        nes.startPlay();
                         runState = RunState.PLAY;
                         step = false;
                     } else {
