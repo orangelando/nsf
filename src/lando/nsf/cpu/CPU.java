@@ -30,8 +30,9 @@ public final class CPU {
 	public static final int STATUS_N = 0x80; //negative flag
 	
 	public static final int START_STATUS = STATUS_B | STATUS_E;
-	
 	public static final int STACK_START = 0x0100;
+	
+	// == instance members =================================================
 	
 	private final Memory mem;
 	
@@ -60,7 +61,22 @@ public final class CPU {
 	
 	public int step() {
 	    
-		int cycles;
+        final int cycles;
+	    
+	    /* technically this happens *after* the last instruction finishes
+	     * see http://www.6502.org/tutorials/interrupts.html
+	     * 
+	     * to be more accurate I should also track if the last executed
+	     * instruction was a branch and if it was taken and how many cycles.
+	     * see http://forum.6502.org/viewtopic.php?f=4&t=1634
+	     */
+	    if( interrupt && (P & STATUS_I) != 0) {
+	        irq();
+	        cycles = 7;
+	        
+	        return cycles;
+	    }
+	    
 		int opCode = mem.read(PC++);
 		
 		/**
@@ -494,6 +510,13 @@ public final class CPU {
         setStatus(true, STATUS_B);
 	}
 	
+	private void irq() {
+	    pushAddr(PC);
+	    push(P | STATUS_B | STATUS_E);
+        PC = (mem.read(0xFFFF) << 8) | mem.read(0xFFFE);
+        setStatus(true, STATUS_B);
+	}
+	
 	private void setZN(int n) {
 		setStatus( (n & 0xFF) == 0, STATUS_Z);
 		setStatus( (n & 0x80) != 0, STATUS_N);
@@ -764,7 +787,7 @@ public final class CPU {
 	    branch(flag, FlagStatus.SET);
 	}
 	
-   private void branch(int flag, FlagStatus desiredStatus) {
+    private void branch(int flag, FlagStatus desiredStatus) {
         
         int offset = (byte)readImmediate();
         FlagStatus status = (P & flag) == 0 ? FlagStatus.CLEAR : FlagStatus.SET;
@@ -781,7 +804,6 @@ public final class CPU {
             branchedToNewPage = 0;
         }
     }
-
 	
 	private void bit(int M) {
 		setStatus( (A & M) == 0, STATUS_Z);
