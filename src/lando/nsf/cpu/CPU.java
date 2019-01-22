@@ -512,7 +512,10 @@ public final class CPU {
 	
 	private void irq() {
 	    pushAddr(PC);
-	    push(P | STATUS_B | STATUS_E);
+	    
+	    //IRS and NMI sets bits 5 and 4 to 1 and 0 respectively
+	    //see https://wiki.nesdev.com/w/index.php/Status_flags#The_B_flag
+	    push( (P & (~STATUS_B)) | STATUS_E);
         PC = (mem.read(0xFFFF) << 8) | mem.read(0xFFFE);
         setStatus(true, STATUS_B);
 	}

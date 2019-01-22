@@ -30,7 +30,7 @@ public final class APURegisters {
     private static final int STATUS_ADDR          = 0x4015;
     private static final int FRAME_COUNTER_ADDR   = 0x4017;
 
-    //these are addtional diagnostic registers that 
+    //these are additional diagnostic registers that 
     /*
     private static final int PULSE_1_AND_2_OUTPUT_ADDR      = 0x4018;
     private static final int TRIANGLE_AND_NOISE_OUTPUT_ADDR = 0x4019;
