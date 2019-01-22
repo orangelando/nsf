@@ -16,20 +16,21 @@ public final class CPU {
         SET, CLEAR
     }
     
-    public static final int START_STATUS = 0b00_1_10000;
-
     public static final int NMI_VECTOR_ADDR   = 0xFF_FA;
     public static final int RESET_VECTOR_ADDR = 0xFF_FC;
     public static final int IRQ_VECTOR_ADDR   = 0xFF_FE;
     
-	public static final int STATUS_C = 0x01;
-	public static final int STATUS_Z = 0x02;
-	public static final int STATUS_I = 0x04;
-	public static final int STATUS_D = 0x08;
-	public static final int STATUS_B = 0x10;
-	public static final int STATUS_E = 0x20;
-	public static final int STATUS_O = 0x40;
-	public static final int STATUS_N = 0x80;
+	public static final int STATUS_C = 0x01; //carry 
+	public static final int STATUS_Z = 0x02; //zero
+	public static final int STATUS_I = 0x04; //interrupt disable
+	public static final int STATUS_D = 0x08; //decimal
+	public static final int STATUS_B = 0x10; //unused
+	public static final int STATUS_E = 0x20; //unused
+	public static final int STATUS_O = 0x40; //overflow also 'V' in some literature
+	public static final int STATUS_N = 0x80; //negative flag
+	
+	public static final int START_STATUS = STATUS_B | STATUS_E;
+	
 	public static final int STACK_START = 0x0100;
 	
 	private final Memory mem;
@@ -43,7 +44,10 @@ public final class CPU {
 	public int A  = 0;
 	public int X  = 0;
 	public int Y  = 0;
-	public int S  = 0xFF; 
+	public int S  = 0xFF;
+	public boolean interrupt = false;
+	
+	//public boolean nonMaskableInterrupt = false; TODO implement NMI
 		
 	public CPU(Memory mem) {
 		Validate.notNull(mem);
@@ -244,7 +248,8 @@ public final class CPU {
 			case 0x48: push(A); cycles = 3; break;
 			
 			//PHP
-			case 0x08: push(P); cycles = 3; break;
+			//software status pushes always set bits 4 and 5.
+			case 0x08: push(P | STATUS_B | STATUS_E); cycles = 3; break;
 			
 			//PLA
 			case 0x68: A = pull(); setZN(A); cycles = 4; break;
@@ -484,7 +489,7 @@ public final class CPU {
 	
 	private void brk() {
         pushAddr(PC);
-        push(P);
+        push(P | STATUS_B | STATUS_E);
         PC = (mem.read(0xFFFF) << 8) | mem.read(0xFFFE);
         setStatus(true, STATUS_B);
 	}

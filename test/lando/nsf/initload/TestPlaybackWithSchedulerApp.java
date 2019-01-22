@@ -10,8 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import lando.nsf.core6502.StringUtils;
 import lando.nsf.cpu.Memory;
+import lando.nsf.cpu.StringUtils;
 
 public class TestPlaybackWithSchedulerApp {
     
