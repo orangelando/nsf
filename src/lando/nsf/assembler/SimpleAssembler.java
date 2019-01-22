@@ -85,6 +85,7 @@ public final class SimpleAssembler {
         return new AssemblerResults(img, addrsToLineNum, addressLabels);
     }
     
+    /*
     private void logSymbolsAndLabels() {
         logMap("defines", defines);
         logMap("addressLabels", addressLabels);
@@ -105,6 +106,7 @@ public final class SimpleAssembler {
             System.err.printf("%-"+maxKeyLen+"s => $%4x%n", key, map.get(key));
         });
     }
+    */
     
     private String[] tokenize(String line) {
         String[] tokens = line.split("\\s+");

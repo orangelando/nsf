@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lando.nsf.HexUtils;
-import lando.nsf.cpu.ByteArrayMem;
 import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.Instruction;
 import lando.nsf.cpu.Instructions;

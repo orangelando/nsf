@@ -1,6 +1,5 @@
 package lando.nsf.snakes;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -81,13 +80,13 @@ public final class Easy6502SnakesApp {
         
         while(mainFrame.isVisible()) {
             
-            List<Character> keysPressed = kb.drainKeyQueue();
+            //List<Character> keysPressed = kb.drainKeyQueue();
             
             //if( keysPressed.contains('q') || keysPressed.contains('Q') || 
             //    keysPressed.contains('z') || keysPressed.contains('Z')) {
                 
-                int numSteps = keysPressed.contains('z') || keysPressed.contains('Z') 
-                        ? 100 : 1;
+                //int numSteps = keysPressed.contains('z') || keysPressed.contains('Z') 
+                //        ? 100 : 1;
             
                 for(int i = 0; i < 100; i++) {
                     rnd.setRandByte();

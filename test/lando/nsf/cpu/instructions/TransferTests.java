@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.ExpectedState;
 
 public class TransferTests {

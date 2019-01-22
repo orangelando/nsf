@@ -3,8 +3,6 @@ package lando.nsf.initload;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TestPlaybackApp {
