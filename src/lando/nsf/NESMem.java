@@ -1,11 +1,11 @@
 package lando.nsf;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
 import lando.nsf.apu.APU;
+import lando.nsf.apu.APURegisters;
 import lando.nsf.cpu.Memory;
 
 public final class NESMem implements Memory {
@@ -15,22 +15,12 @@ public final class NESMem implements Memory {
     public static final int LAST_BANK_SWITCH_REGISTER  = 0x5FFF;
 	
 	public final byte [] bytes = new byte[65536];
-	
-	private final APU apu;
+	private final APURegisters apuRegs;
 	private byte[][] banks = null;
     private boolean isBankSwitching = false;
-	
-	
-    public static final int NUM_ACCESSES = 4096;
-    
-	public final int[] readAddrs  = new int[NUM_ACCESSES];
-	public final int[] writeAddrs = new int[NUM_ACCESSES];
-	
-	public int reads = 0;
-	public int writes = 0;
-	
+		
 	public NESMem(APU apu) {
-	    this.apu = Objects.requireNonNull(apu);
+	    this.apuRegs = new APURegisters(apu);
 	}
 	
 	public void clearMem() {
@@ -62,13 +52,10 @@ public final class NESMem implements Memory {
 	public int read(int addr) {
 		addr = trans(addr);
 		
-		readAddrs[(reads++)%NUM_ACCESSES] = addr;
 		int M = bytes[addr] & 0xFF;
 		
-		if( apu != null ) { 
-			switch(addr) {
-			case 0x4015: M = apu.getApuFlags(); break;
-			}
+		if( apuRegs.isAPURegister(addr)) {
+		    M = apuRegs.read(addr);
 		}
 		
 		return M;
@@ -78,7 +65,6 @@ public final class NESMem implements Memory {
 	public void write(int addr, int M) {
 		addr = trans(addr);
 		
-		writeAddrs[(writes++)%NUM_ACCESSES] = addr;
 		bytes[addr] = (byte)(M & 0xFF);
 		
 		if( isBankSwitching && addr >= FIRST_BANK_SWITCH_REGISTER && addr <= LAST_BANK_SWITCH_REGISTER ) {
@@ -89,41 +75,8 @@ public final class NESMem implements Memory {
             System.arraycopy(newBank, 0, bytes, startAddr, newBank.length);
 		}
 		
-		if( apu != null ) { 
-			switch(addr) {
-			
-			//Pulse 1 channel
-			case 0x4000: 				break;
-			case 0x4001: 				break;
-			case 0x4002: 				break;
-			case 0x4003: 				break;
-				
-			//Pulse 2 channel
-			case 0x4004: 				break;
-			case 0x4005: 				break;
-			case 0x4006: 				break;
-			case 0x4007: 				break;
-				
-			//Triangle channel
-			case 0x4008: 				break;
-			case 0x400A: 				break;
-			case 0x400B: 				break;
-				
-			//Noise channel
-			case 0x400C: 				break;
-			case 0x400E: 				break;
-			case 0x400F: 				break;
-				
-			//DMC channel
-			case 0x4010:				break;
-			case 0x4011:				break;
-			case 0x4012:				break;
-			case 0x4013:				break;
-				
-			//misc
-			case 0x4015: apu.setApuFlags(M & 0x1F); break;
-			case 0x4017: break;
-			}
+		if( apuRegs.isAPURegister(addr)) {
+		    apuRegs.write(addr, M);
 		}
 	}
 	

@@ -2,6 +2,14 @@ package lando.nsf.cpu;
 
 import org.apache.commons.lang3.Validate;
 
+/**
+ * Executes the instructions for the NES Rico 2A03 
+ * which is has the NMOS 6502 as its core sans the BCD math.
+ * 
+ * It is not cycle accurate. Only the before and after states of each
+ * instruction is simulated.
+ * 
+ */
 public final class CPU {
     
     private static enum FlagStatus {

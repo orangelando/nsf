@@ -209,8 +209,8 @@ public final class CpuTestApp {
 	}
 	
 	private static int runUntilRTS(CPU cpu, NESMem mem) {
-		mem.reads = 0;
-		mem.writes = 0;
+		//mem.reads = 0;
+		//mem.writes = 0;
 		int cycles = 0;
 		
 		while( mem.read(cpu.PC) != 0x60 ) {
@@ -222,8 +222,8 @@ public final class CpuTestApp {
 
 	private static void step(NSF nsf, CPU cpu, NESMem mem, int steps) {
 		int cycles = 0;
-		mem.reads = 0;
-		mem.writes = 0;
+		//mem.reads = 0;
+		//mem.writes = 0;
 		
 		long start = System.nanoTime();
 		for(int i = 0; i < steps; i++) {
@@ -255,13 +255,13 @@ public final class CpuTestApp {
 		
 		addressBlocks.add( cpu.PC & 0xFF00 );
 		
-		for(int i = 0; i < mem.reads; i++) {
-			addressBlocks.add(mem.readAddrs[i] & 0xFF00);
-		}
+		//for(int i = 0; i < mem.reads; i++) {
+		//	addressBlocks.add(mem.readAddrs[i] & 0xFF00);
+		//}
 		
-		for(int i = 0; i < mem.writes; i++) {
-			addressBlocks.add(mem.writeAddrs[i] & 0xFF00);
-		}
+		//for(int i = 0; i < mem.writes; i++) {
+		//	addressBlocks.add(mem.writeAddrs[i] & 0xFF00);
+		//}
 		
 		long start, end;
 		
@@ -290,13 +290,13 @@ public final class CpuTestApp {
 		final Set<Integer> reads  = new HashSet<Integer>();
 		final Set<Integer> writes = new HashSet<Integer>();
 		
-		for(int i = 0; i < mem.reads; i++) {
-			reads.add(mem.readAddrs[i]);
-		}
+		//for(int i = 0; i < mem.reads; i++) {
+		//	reads.add(mem.readAddrs[i]);
+		//}
 		
-		for(int i = 0; i < mem.writes; i++) {
-			writes.add(mem.writeAddrs[i]);
-		}
+		//for(int i = 0; i < mem.writes; i++) {
+		//	writes.add(mem.writeAddrs[i]);
+		//}
 		
 		StringWriter writer = new StringWriter();
 		PrintWriter out = new PrintWriter(writer);
