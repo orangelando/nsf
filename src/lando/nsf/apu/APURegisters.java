@@ -15,12 +15,14 @@ public final class APURegisters {
     private static final int PULSE_2_LEN_TIMER_ADDR  = 0x4007;
     
     private static final int TRIANGLE_STATUS_ADDR    = 0x4008;
+    private static final int TRIANGLE_UNUSED_ADDR    = 0x4009;
     private static final int TRIANGLE_TIMER_LOW_ADDR = 0x400A;
     private static final int TRIANGLE_LEN_TIMER_ADDR = 0x400B;
     
-    private static final int NOISE_STATUS_ADDR      = 0x400C;
-    private static final int NOISE_LOOP_PERIOD_ADDR = 0x400E;
-    private static final int NOISE_LEN_COUNTER_ADDR = 0x400F;
+    private static final int NOISE_STATUS_ADDR       = 0x400C;
+    private static final int NOISE_UNUSED_ADDR       = 0x400D;
+    private static final int NOISE_LOOP_PERIOD_ADDR  = 0x400E;
+    private static final int NOISE_LEN_COUNTER_ADDR  = 0x400F;
     
     private static final int DMC_STATUS_ADDR      = 0x4010;
     private static final int DMC_DIRECT_LOAD_ADDR = 0x4011;
@@ -29,14 +31,6 @@ public final class APURegisters {
     
     private static final int STATUS_ADDR          = 0x4015;
     private static final int FRAME_COUNTER_ADDR   = 0x4017;
-
-    //these are additional diagnostic registers that 
-    /*
-    private static final int PULSE_1_AND_2_OUTPUT_ADDR      = 0x4018;
-    private static final int TRIANGLE_AND_NOISE_OUTPUT_ADDR = 0x4019;
-    private static final int DPCM_OUTPUT_ADDR               = 0x401A;
-    private static final int SET_TRIANGLE_POS_ADDR          = 0x401A;
-    */
     
     private final APU apu;
     
@@ -54,8 +48,36 @@ public final class APURegisters {
     public void write(int addr, int M) {
         
         switch(addr) {
+        
         case STATUS_ADDR: //acts as a control register when written to
-            break;
+        {
+            
+        }
+        break;
+            
+        case PULSE_1_LEN_TIMER_ADDR:
+        {
+            apu.pulse1.lengthCounter.reload(M);
+        }
+        break;
+        
+        case PULSE_2_LEN_TIMER_ADDR:
+        {
+            apu.pulse2.lengthCounter.reload(M);
+        }
+        break;
+        
+        case TRIANGLE_LEN_TIMER_ADDR:
+        {
+            apu.triangle.lengthCounter.reload(M);
+        }
+        break;
+        
+        case NOISE_LEN_COUNTER_ADDR:
+        {
+            apu.noise.lengthCounter.reload(M);
+        }
+        break;
             
         case FRAME_COUNTER_ADDR: 
         {
@@ -64,12 +86,21 @@ public final class APURegisters {
             int mode = (M>>7)&1;
             int irqDisable = (M>>6)&1;
             
+            apu.frameSequencer.resetDividerAndSequencer();
+            
             if( mode == 0 ) {
                 apu.frameSequencer.select4StepMode();
             } else {
                 apu.frameSequencer.select5StepMode();
-                apu.frameSequencer.clock();
+                apu.frameSequencer.clockSequencer();
             }
+            
+            if( irqDisable == 0 ) {
+                apu.frameSequencer.clearIRQDisable();
+            } else {
+                apu.frameSequencer.setIRQDisable();
+            }
+            
         } break;
         
         }
@@ -78,11 +109,14 @@ public final class APURegisters {
     public int read(int addr) {
         
         switch(addr) {
+        
         case STATUS_ADDR:
-            break;
+        {
+            apu.frameSequencer.clearIRQDisable();
+        }
+        break;
         }
         
         throw new IllegalStateException(String.format("%x is not an readable APU register", addr));
     }
-
 }

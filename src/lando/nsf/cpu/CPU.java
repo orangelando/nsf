@@ -1,5 +1,7 @@
 package lando.nsf.cpu;
 
+import java.util.EnumSet;
+
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -40,13 +42,17 @@ public final class CPU {
 	private int branchTaken;
 	private int branchedToNewPage;
 	
+	//IRQ flag is a level sensitive that is asserted if any one source asserts it.
+	//it's straightforward to show this as a collection. 
+	private EnumSet<IRQSource> interruptRequests = 
+	        EnumSet.noneOf(IRQSource.class);
+	
 	public int P  = START_STATUS; 
 	public int PC = 0;
 	public int A  = 0;
 	public int X  = 0;
 	public int Y  = 0;
 	public int S  = 0xFF;
-	public boolean interrupt = false;
 	
 	//public boolean nonMaskableInterrupt = false; TODO implement NMI
 		
@@ -55,8 +61,28 @@ public final class CPU {
 		this.mem = mem;
 	}
 	
+	public void setIRQ(IRQSource src) {
+	    if( src == null ) {
+	        throw new IllegalArgumentException("IRQ source cannot be null");
+	    }
+	    
+	    interruptRequests.add(src);
+	}
+	
+	public void clearIRQ(IRQSource src) {
+	    if( src == null ) {
+            throw new IllegalArgumentException("IRQ source cannot be null");
+        }
+        
+        interruptRequests.remove(src);
+	}
+	
 	public int stackAddr() {
 	    return STACK_START + (S&0xFF);
+	}
+	
+	public boolean areInterruptsDisabled() {
+	    return (P & STATUS_I) != 0;
 	}
 	
 	public int step() {
@@ -70,7 +96,7 @@ public final class CPU {
 	     * instruction was a branch and if it was taken and how many cycles.
 	     * see http://forum.6502.org/viewtopic.php?f=4&t=1634
 	     */
-	    if( interrupt && (P & STATUS_I) != 0) {
+	    if( ! areInterruptsDisabled() && ! interruptRequests.isEmpty() ) {
 	        irq();
 	        cycles = 7;
 	        

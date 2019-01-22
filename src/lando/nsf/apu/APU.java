@@ -17,14 +17,23 @@ public final class APU {
 	boolean noiseEnabled = false;
 	boolean dmcEnabled = false;
 	
-	final FrameSequencer frameSequencer = new FrameSequencer();
 	final PulseChannel pulse1 = new PulseChannel();
 	final PulseChannel pulse2 = new PulseChannel();
 	final TriangleChannel triangle = new TriangleChannel();
 	final NoiseChannel noise = new NoiseChannel();
 	final DeltaModulationChannel dmc = new DeltaModulationChannel();
+	final FrameSequencer frameSequencer;
 	
-	
+	public APU() {
+	    this.frameSequencer = new FrameSequencer(
+	            null,
+	            pulse1,
+	            pulse2,
+	            triangle,
+	            noise,
+	            dmc
+	            );
+	}
 	
 	public void step() {
 		
