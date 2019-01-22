@@ -11,6 +11,9 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.Validate;
 
+import lando.nsf.cpu.CPU;
+import lando.nsf.cpu.Memory;
+
 public final class ExpectedState {
     
     private static Map<Integer, Integer> toMem(int ... addrDataPairs) {

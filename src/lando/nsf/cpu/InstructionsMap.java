@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf.cpu;
 
 import java.util.Collections;
 import java.util.EnumMap;

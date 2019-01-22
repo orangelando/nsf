@@ -6,6 +6,11 @@ import static lando.nsf.core6502.StringUtils.toHex4;
 
 import java.io.PrintStream;
 
+import lando.nsf.cpu.CPU;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
+import lando.nsf.cpu.Memory;
+
 final class StatusPrinter {
     
     private static final PrintStream out = System.err;

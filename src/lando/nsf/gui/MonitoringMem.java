@@ -4,15 +4,24 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import lando.nsf.core6502.Memory;
+import lando.nsf.cpu.Memory;
 
 public final class MonitoringMem implements Memory {
 
-    private final Memory mem;
+    private Memory mem;
+    
     private final Set<Integer> reads = new HashSet<>();
     private final Set<Integer> writes = new HashSet<>();
     
+    public MonitoringMem() {
+        this.mem = null;
+    }
+    
     public MonitoringMem(Memory mem) {
+        this.mem = Objects.requireNonNull(mem);
+    }
+    
+    public void setMemory(Memory mem) {
         this.mem = Objects.requireNonNull(mem);
     }
     

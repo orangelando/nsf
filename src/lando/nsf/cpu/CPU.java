@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf.cpu;
 
 import org.apache.commons.lang3.Validate;
 

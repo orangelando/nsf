@@ -2,7 +2,7 @@ package lando.nsf.assembler;
 
 import org.apache.commons.lang3.Validate;
 
-import lando.nsf.core6502.Instruction;
+import lando.nsf.cpu.Instruction;
 
 final class InstrByteEmitter {
     

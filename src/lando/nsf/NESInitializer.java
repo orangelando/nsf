@@ -2,8 +2,8 @@ package lando.nsf;
 
 import java.util.Arrays;
 
-import lando.nsf.core6502.CPU;
-import lando.nsf.core6502.Memory;
+import lando.nsf.cpu.CPU;
+import lando.nsf.cpu.Memory;
 
 /**
  * Taken from: 

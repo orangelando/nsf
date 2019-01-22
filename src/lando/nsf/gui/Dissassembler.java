@@ -16,10 +16,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lando.nsf.HexUtils;
-import lando.nsf.core6502.ByteArrayMem;
-import lando.nsf.core6502.CPU;
-import lando.nsf.core6502.Instruction;
-import lando.nsf.core6502.Instructions;
+import lando.nsf.cpu.ByteArrayMem;
+import lando.nsf.cpu.CPU;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
 
 public final class Dissassembler {
 

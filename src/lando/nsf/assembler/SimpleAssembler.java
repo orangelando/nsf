@@ -1,18 +1,18 @@
 package lando.nsf.assembler;
 
-import static lando.nsf.core6502.AddrMode.ABSOLUTE;
-import static lando.nsf.core6502.AddrMode.ABSOLUTE_X;
-import static lando.nsf.core6502.AddrMode.ABSOLUTE_Y;
-import static lando.nsf.core6502.AddrMode.ACCUMULATOR;
-import static lando.nsf.core6502.AddrMode.IMMEDIATE;
-import static lando.nsf.core6502.AddrMode.IMPLIED;
-import static lando.nsf.core6502.AddrMode.INDIRECT;
-import static lando.nsf.core6502.AddrMode.INDIRECT_X;
-import static lando.nsf.core6502.AddrMode.INDIRECT_Y;
-import static lando.nsf.core6502.AddrMode.RELATIVE;
-import static lando.nsf.core6502.AddrMode.ZERO_PAGE;
-import static lando.nsf.core6502.AddrMode.ZERO_PAGE_X;
-import static lando.nsf.core6502.AddrMode.ZERO_PAGE_Y;
+import static lando.nsf.cpu.AddrMode.ABSOLUTE;
+import static lando.nsf.cpu.AddrMode.ABSOLUTE_X;
+import static lando.nsf.cpu.AddrMode.ABSOLUTE_Y;
+import static lando.nsf.cpu.AddrMode.ACCUMULATOR;
+import static lando.nsf.cpu.AddrMode.IMMEDIATE;
+import static lando.nsf.cpu.AddrMode.IMPLIED;
+import static lando.nsf.cpu.AddrMode.INDIRECT;
+import static lando.nsf.cpu.AddrMode.INDIRECT_X;
+import static lando.nsf.cpu.AddrMode.INDIRECT_Y;
+import static lando.nsf.cpu.AddrMode.RELATIVE;
+import static lando.nsf.cpu.AddrMode.ZERO_PAGE;
+import static lando.nsf.cpu.AddrMode.ZERO_PAGE_X;
+import static lando.nsf.cpu.AddrMode.ZERO_PAGE_Y;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +24,10 @@ import org.apache.commons.lang3.Validate;
 
 import lando.nsf.ExecutableImage;
 import lando.nsf.MemorySegment;
-import lando.nsf.core6502.AddrMode;
-import lando.nsf.core6502.Instruction;
-import lando.nsf.core6502.Instructions;
-import lando.nsf.core6502.OpCodeName;
+import lando.nsf.cpu.AddrMode;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
+import lando.nsf.cpu.OpCodeName;
 
 
 /**

@@ -30,8 +30,8 @@ import lando.nsf.HexUtils;
 import lando.nsf.NSF;
 import lando.nsf.NSFHeader;
 import lando.nsf.NSFReader;
-import lando.nsf.core6502.Instruction;
-import lando.nsf.core6502.Instructions;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
 
 public final class WriteNSFIndexApp {
     

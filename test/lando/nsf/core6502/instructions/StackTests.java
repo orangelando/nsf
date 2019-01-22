@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import lando.nsf.core6502.CPU;
 import lando.nsf.core6502.ExpectedState;
+import lando.nsf.cpu.CPU;
 
 public class StackTests {
 

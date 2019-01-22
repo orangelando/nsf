@@ -16,15 +16,15 @@ import javax.swing.JTextPane;
 
 import org.apache.commons.lang3.Validate;
 
-import lando.nsf.APU;
 import lando.nsf.DisassemblerUtils;
 import lando.nsf.HexUtils;
 import lando.nsf.NESMem;
 import lando.nsf.NSF;
 import lando.nsf.NSFReader;
-import lando.nsf.core6502.CPU;
-import lando.nsf.core6502.Instruction;
-import lando.nsf.core6502.Instructions;
+import lando.nsf.apu.APU;
+import lando.nsf.cpu.CPU;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
 
 public final class CpuTestApp {
 	

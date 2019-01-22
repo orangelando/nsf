@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf.cpu;
 
 public interface Memory {
 

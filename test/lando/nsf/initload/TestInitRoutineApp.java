@@ -12,9 +12,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import lando.nsf.NESMem;
-import lando.nsf.core6502.CPU;
+import lando.nsf.cpu.CPU;
 import lando.nsf.gui.Dissassembler;
 import lando.nsf.gui.MemoryMonitor;
+import lando.nsf.gui.MonitoringMem;
 import lando.nsf.gui.TextLines;
 
 public final class TestInitRoutineApp {
@@ -24,7 +25,12 @@ public final class TestInitRoutineApp {
         Path path = Paths.get(
                 "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf");
         
-        NES nes = NES.buildForPath(path);
+        MonitoringMem monitoringMem = new MonitoringMem();
+        NES nes = NES.buildForPath(path, (mem) -> {
+            monitoringMem.setMemory(mem);
+            
+            return monitoringMem;
+        });
         
         int songIndex = 1;
         
@@ -44,14 +50,14 @@ public final class TestInitRoutineApp {
                 new TreeMap<Integer, Integer>(),
                 new HashMap<String, Integer>());
 
-        MemoryMonitor zeroPage     = new MemoryMonitor(0, 256, 16, nes.cpu, nes.monitoringMem);
-        MemoryMonitor stackPage    = new MemoryMonitor(CPU.STACK_START, 256, 16, nes.cpu, nes.monitoringMem);
+        MemoryMonitor zeroPage     = new MemoryMonitor(0, 256, 16, nes.cpu, monitoringMem);
+        MemoryMonitor stackPage    = new MemoryMonitor(CPU.STACK_START, 256, 16, nes.cpu, monitoringMem);
         
         MemoryMonitor bankRegsPage = new MemoryMonitor(
-                NESMem.FIRST_BANK_SWITCH_REGISTER, 16, 16, nes.cpu, nes.monitoringMem);
+                NESMem.FIRST_BANK_SWITCH_REGISTER, 16, 16, nes.cpu, monitoringMem);
         
         MemoryMonitor apuRegsPage = new MemoryMonitor(
-                0x4000, 32, 16, nes.cpu, nes.monitoringMem);
+                0x4000, 32, 16, nes.cpu, monitoringMem);
 
         TextLines dissassemblerTxt = new TextLines(dissassembler::currStatus);
         
@@ -115,7 +121,7 @@ public final class TestInitRoutineApp {
                 }
                 
                 if( step ) {
-                    nes.monitoringMem.clearReadsAndWrites();
+                    monitoringMem.clearReadsAndWrites();
                     nes.cpu.step();
                     numInstrs.incrementAndGet();
                 }
@@ -144,5 +150,4 @@ public final class TestInitRoutineApp {
         
         return mainFrame;
     }
-
 }

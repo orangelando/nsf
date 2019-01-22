@@ -8,6 +8,8 @@ import org.junit.Assert;
 
 import lando.nsf.ExecutableImage;
 import lando.nsf.assembler.SimpleAssembler;
+import lando.nsf.cpu.ByteArrayMem;
+import lando.nsf.cpu.CPU;
 
 public final class TestRunner {
     

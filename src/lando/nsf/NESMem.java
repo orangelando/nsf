@@ -5,7 +5,8 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
-import lando.nsf.core6502.Memory;
+import lando.nsf.apu.APU;
+import lando.nsf.cpu.Memory;
 
 public final class NESMem implements Memory {
 	

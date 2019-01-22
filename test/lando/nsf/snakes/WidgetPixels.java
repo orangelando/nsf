@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
-import lando.nsf.core6502.ByteArrayMem;
+import lando.nsf.cpu.ByteArrayMem;
 
 @SuppressWarnings("serial")
 final class WidgetPixels extends JPanel {

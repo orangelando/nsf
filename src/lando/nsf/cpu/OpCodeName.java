@@ -1,4 +1,4 @@
-package lando.nsf.core6502;
+package lando.nsf.cpu;
 
 public enum OpCodeName {
     ADC, AND, ASL, BCC, BCS, BEQ, BIT, BMI, BNE, BPL, BRK, BVC, BVS, CLC,

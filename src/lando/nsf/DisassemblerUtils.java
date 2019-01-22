@@ -2,8 +2,8 @@ package lando.nsf;
 
 import org.apache.commons.lang3.Validate;
 
-import lando.nsf.core6502.Instruction;
-import lando.nsf.core6502.Instructions;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
 
 public final class DisassemblerUtils {
 

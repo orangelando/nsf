@@ -3,7 +3,7 @@ package lando.nsf.snakes;
 import java.util.Objects;
 import java.util.Random;
 
-import lando.nsf.core6502.ByteArrayMem;
+import lando.nsf.cpu.ByteArrayMem;
 
 final class WidgetRandom {
     

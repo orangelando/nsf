@@ -1,4 +1,4 @@
-package lando.nsf;
+package lando.nsf.apu;
 
 /**
  * http://wiki.nesdev.com/w/index.php/APU_Mixer

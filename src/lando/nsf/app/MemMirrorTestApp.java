@@ -1,8 +1,8 @@
 package lando.nsf.app;
 
-import lando.nsf.APU;
 import lando.nsf.HexUtils;
 import lando.nsf.NESMem;
+import lando.nsf.apu.APU;
 
 public final class MemMirrorTestApp {
 

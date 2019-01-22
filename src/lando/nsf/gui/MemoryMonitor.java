@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 
 import lando.nsf.HexUtils;
-import lando.nsf.core6502.CPU;
+import lando.nsf.cpu.CPU;
 
 public final class MemoryMonitor {
     

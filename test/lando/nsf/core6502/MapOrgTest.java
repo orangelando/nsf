@@ -4,6 +4,11 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import lando.nsf.cpu.AddrMode;
+import lando.nsf.cpu.Instruction;
+import lando.nsf.cpu.Instructions;
+import lando.nsf.cpu.OpCodeName;
+
 public class MapOrgTest {
 
     @Test
