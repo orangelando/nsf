@@ -15,11 +15,14 @@ public final class NESMem implements Memory {
     public static final int LAST_BANK_SWITCH_REGISTER  = 0x5FFF;
 	
 	public final byte [] bytes = new byte[65536];
-	private final APURegisters apuRegs;
+	private APURegisters apuRegs = null;
 	private byte[][] banks = null;
     private boolean isBankSwitching = false;
 		
-	public NESMem(APU apu) {
+	public NESMem() {
+	}
+	
+	public void setAPU(APU apu) {
 	    this.apuRegs = new APURegisters(apu);
 	}
 	
@@ -54,7 +57,7 @@ public final class NESMem implements Memory {
 		
 		int M = bytes[addr] & 0xFF;
 		
-		if( apuRegs.isAPURegister(addr)) {
+		if( apuRegs != null && apuRegs.isAPURegister(addr)) {
 		    M = apuRegs.read(addr);
 		}
 		
@@ -75,7 +78,7 @@ public final class NESMem implements Memory {
             System.arraycopy(newBank, 0, bytes, startAddr, newBank.length);
 		}
 		
-		if( apuRegs.isAPURegister(addr)) {
+		if( apuRegs != null && apuRegs.isAPURegister(addr)) {
 		    apuRegs.write(addr, M);
 		}
 	}

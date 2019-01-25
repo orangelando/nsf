@@ -2,13 +2,12 @@ package lando.nsf.app;
 
 import lando.nsf.HexUtils;
 import lando.nsf.NESMem;
-import lando.nsf.apu.APU;
 
 public final class MemMirrorTestApp {
 
 	public static void main(String [] args) throws Exception {
-	    APU apu = new APU();
-		NESMem mem = new NESMem(apu);
+	    //APU apu = new APU();
+		NESMem mem = new NESMem();
 		
 		//mirrored working RAM
 		for(int i = 0; i < 20; i++) {

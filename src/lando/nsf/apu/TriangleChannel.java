@@ -2,5 +2,6 @@ package lando.nsf.apu;
 
 public final class TriangleChannel {
 
-    LengthCounter lengthCounter;
+    LengthCounter lengthCounter = new LengthCounter();
+    EnvelopeGenerator envelopeGenerator = new EnvelopeGenerator();
 }

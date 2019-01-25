@@ -6,5 +6,6 @@ public final class PlayStats {
     public long execElapsedTime = 0;
     public long numInstrsExec = 0;
     public long timesWaited = 0;
+    public long numCycles = 0;
 
 }

@@ -2,7 +2,7 @@ package lando.nsf.apu;
 
 public final class LengthCounter {
 
-    private final int[][] LENGTH_LOOKUP_TABLE = {
+    private static final int[][] LENGTH_LOOKUP_TABLE = {
             {0x0A, 0xFE},   // 0
             {0x14, 0x02},   // 1
             {0x28, 0x04},   // 2
@@ -28,13 +28,26 @@ public final class LengthCounter {
      * 
      */
     public void reload(int registerVal) {
+        if( disabled ) {
+            return;
+        }
+        
         registerVal >>= 3;
         
         count = LENGTH_LOOKUP_TABLE[(registerVal>>1)&0xF][registerVal&1];
     }
     
+    public void setDisabled(boolean flag) {
+        if( flag ) {
+            setDisabled();
+        } else {
+            clearDisabled();
+        }
+    }
+    
     public void setDisabled() {
         disabled = true;
+        count = 0;
     }
     
     public void clearDisabled() {
@@ -42,12 +55,16 @@ public final class LengthCounter {
     }
     
     public void clock() {
-        if( ! disabled && count > 0 ) {
+        if( disabled ) {
+            return;
+        }
+        
+        if( count > 0 ) {
             --count;
         }
     }
     
-    public boolean isZero() {
-        return count == 0;
+    public int getCount() {
+        return count;
     }
 }

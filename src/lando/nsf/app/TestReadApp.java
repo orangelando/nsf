@@ -9,7 +9,6 @@ import java.util.Arrays;
 import lando.nsf.NESMem;
 import lando.nsf.NSF;
 import lando.nsf.NSFReader;
-import lando.nsf.apu.APU;
 import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.Instruction;
 import lando.nsf.cpu.Instructions;
@@ -24,8 +23,8 @@ public class TestReadApp {
 				//"/Users/oroman/Downloads/Metroid.nsf"
 				);
 		
-	    APU apu = new APU();
-		NESMem mem = new NESMem(apu);
+	    //APU apu = new APU();
+		NESMem mem = new NESMem();
 		CPU cpu = new CPU(mem);
 		NSF nsf = NSFReader.readNSF(file);
 		

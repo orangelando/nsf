@@ -21,7 +21,6 @@ import lando.nsf.HexUtils;
 import lando.nsf.NESMem;
 import lando.nsf.NSF;
 import lando.nsf.NSFReader;
-import lando.nsf.apu.APU;
 import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.Instruction;
 import lando.nsf.cpu.Instructions;
@@ -30,8 +29,8 @@ public final class CpuTestApp {
 	
 	public static void main(String [] args) throws Exception {
 		final File file = new File("/Users/oroman/Downloads/super-mario-bros-2-nes-[NSF-ID1934].nsf");
-		final APU apu = new APU();
-		final NESMem mem = new NESMem(apu);
+		//final APU apu = new APU();
+		final NESMem mem = new NESMem();
 		final NSF nsf = NSFReader.readNSF(file);
 		final CPU cpu = new CPU(mem);
 		

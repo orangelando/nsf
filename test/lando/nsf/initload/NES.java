@@ -23,11 +23,14 @@ final class NES {
         byte[] bytes = Files.readAllBytes(path);
         
         NSF nsf = NSFReader.readNSF(bytes);
-        APU apu = new APU();
-        NESMem mem = new NESMem(apu);
+        NESMem mem = new NESMem();
         Memory wrappedMem = memDecorator.apply(mem);
-        NSFLoader loader = new NSFLoader(mem, nsf);
         CPU cpu = new CPU(wrappedMem);
+        APU apu = new APU(cpu);
+        
+        mem.setAPU(apu);
+        
+        NSFLoader loader = new NSFLoader(mem, nsf);
 
         //load nsf
         mem.clearMem();
@@ -40,10 +43,12 @@ final class NES {
         byte[] bytes = Files.readAllBytes(path);
         
         NSF nsf = NSFReader.readNSF(bytes);
-        APU apu = new APU();
-        NESMem mem = new NESMem(apu);
+        NESMem mem = new NESMem();
         NSFLoader loader = new NSFLoader(mem, nsf);
         CPU cpu = new CPU(mem);
+        APU apu = new APU(cpu);
+        
+        mem.setAPU(apu);
 
         //load nsf
         mem.clearMem();
@@ -55,6 +60,7 @@ final class NES {
     
     final int stopAddr = CPU.RESET_VECTOR_ADDR;
     final AtomicInteger numInstrs = new AtomicInteger(0);
+    final AtomicInteger numCycles = new AtomicInteger(0);
     
     final NSF nsf;
     final APU apu;
@@ -88,9 +94,10 @@ final class NES {
     
     void runRoutine() {
         numInstrs.set(0);
+        numCycles.set(0);
 
         while( cpu.PC != stopAddr) {
-            cpu.step();
+            numCycles.addAndGet(cpu.step());
             numInstrs.incrementAndGet();
         }
     }

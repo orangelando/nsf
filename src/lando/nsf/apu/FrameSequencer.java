@@ -21,6 +21,7 @@ public final class FrameSequencer {
     private int step = 0;
     private Runnable sequence = this::clockMode4Sequence;
     private boolean disableInterrupts = true;
+    private boolean interruptFlag = false;
     
     public FrameSequencer(
             CPU cpu,
@@ -141,12 +142,18 @@ public final class FrameSequencer {
     
     private void setInterruptFlag() {
         if( ! disableInterrupts ) {
+            interruptFlag = true;
             cpu.setIRQ(IRQSource.APU);
         }
     }
     
-    private void clearInterruptFlag() {
+    public void clearInterruptFlag() {
+        interruptFlag = false;
         cpu.clearIRQ(IRQSource.APU);
+    }
+    
+    public boolean getInterruptFlag() {
+        return interruptFlag;
     }
     
     private void clockLengthCountersAndSweepUnits() {
@@ -157,6 +164,10 @@ public final class FrameSequencer {
     }
     
     private void clockEnvelopesAndTriangleLinearCounter() {
+        pulse1.envelopeGenerator.clock();
+        pulse2.envelopeGenerator.clock();
+        triangle.envelopeGenerator.clock();
+        noise.envelopeGenerator.clock();
         
     }
 }

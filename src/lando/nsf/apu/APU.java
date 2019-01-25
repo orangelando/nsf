@@ -1,11 +1,7 @@
 package lando.nsf.apu;
 
-/**
- * http://wiki.nesdev.com/w/index.php/APU_Mixer
- * 
- * @author oroman
- *
- */
+import lando.nsf.cpu.CPU;
+
 public final class APU {
 
 	float output;
@@ -17,22 +13,16 @@ public final class APU {
 	boolean noiseEnabled = false;
 	boolean dmcEnabled = false;
 	
-	final PulseChannel pulse1 = new PulseChannel();
-	final PulseChannel pulse2 = new PulseChannel();
+	final PulseChannel pulse1 = new PulseChannel(false);
+	final PulseChannel pulse2 = new PulseChannel(true);
 	final TriangleChannel triangle = new TriangleChannel();
 	final NoiseChannel noise = new NoiseChannel();
 	final DeltaModulationChannel dmc = new DeltaModulationChannel();
 	final FrameSequencer frameSequencer;
 	
-	public APU() {
+	public APU(CPU cpu) {
 	    this.frameSequencer = new FrameSequencer(
-	            null,
-	            pulse1,
-	            pulse2,
-	            triangle,
-	            noise,
-	            dmc
-	            );
+	            cpu, pulse1, pulse2, triangle, noise, dmc);
 	}
 	
 	public void step() {

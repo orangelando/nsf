@@ -20,7 +20,9 @@ public class TestPlaybackWithSchedulerApp {
         PrintStream out = System.err;
         
         Path path = Paths.get(
-                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf");
+                //"/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
+                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
+                );
         
         APUCaptureMem apuMem = new APUCaptureMem();
         NES nes = NES.buildForPath(path, (mem) -> {
@@ -33,6 +35,7 @@ public class TestPlaybackWithSchedulerApp {
         int songIndex = 5;
         nes.initTune(songIndex);
         
+        apuMem.startCapturing(System.nanoTime());
         nes.startInit();
         nes.runRoutine();
 
@@ -111,7 +114,7 @@ public class TestPlaybackWithSchedulerApp {
         }
             
         long startPlay = System.nanoTime();
-        apuMem.startCapturing(startPlay);
+        //apuMem.startCapturing(startPlay);
         nes.startPlay();
         nes.runRoutine();
         long endPlay = System.nanoTime();
@@ -121,6 +124,7 @@ public class TestPlaybackWithSchedulerApp {
         stats.playTimestamp = startPlay;
         stats.execElapsedTime = endPlay - startPlay;
         stats.numInstrsExec = nes.numInstrs.get();
+        stats.numCycles = nes.numCycles.get();
         stats.timesWaited = timesWaited;
         
         if( statsList.isFull() ) {
@@ -137,12 +141,13 @@ public class TestPlaybackWithSchedulerApp {
             
             double hz = 1e9/(curr.playTimestamp - prev.playTimestamp);
             
-            out.printf("%10.4fhz, %8dus, %5d, %10.1fmips %d times waited%n", 
+            out.printf("%10.4fhz, %8dus, %5d, %10.1fmips %8d times waited, %5d cycles%n", 
                     hz, 
                     curr.execElapsedTime/1_000, 
                     curr.numInstrsExec,
                     toMIPS(curr.numInstrsExec, curr.execElapsedTime),
-                    curr.timesWaited);
+                    curr.timesWaited,
+                    curr.numCycles);
         }
     }
     
