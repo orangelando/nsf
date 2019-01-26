@@ -4,12 +4,12 @@ public final class EnvelopeGenerator {
 
     private boolean restartOnNextClock = false;
     
-    boolean disable = false;
-    boolean loop = false;
+    public boolean disable = false;
+    public boolean loop = false;
     
-    int dividerPeriod = 1;
-    int counter = 0;
-    int divider = 0;
+    public int dividerPeriod = 1;
+    public int counter = 0;
+    public int divider = 0;
     
     public void restartOnNextClock() {
         restartOnNextClock = true;

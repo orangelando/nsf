@@ -1,4 +1,4 @@
-package lando.nsf.apu;
+package lando.nsf.apu.noise;
 
 import java.util.Objects;
 

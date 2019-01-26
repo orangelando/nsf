@@ -1,6 +1,9 @@
-package lando.nsf.apu;
+package lando.nsf.apu.pulse;
 
 import java.util.Objects;
+
+import lando.nsf.apu.Divider;
+import lando.nsf.apu.Timer;
 
 public final class SweepUnit {
 
@@ -22,7 +25,7 @@ public final class SweepUnit {
         resetDividerOnNextClock = true;
     }
     
-    void clock() {
+    public void clock() {
 
         if( divider.clock() ) {
             int s = getShifter();

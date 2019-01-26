@@ -1,17 +1,12 @@
 package lando.nsf.apu;
 
+import lando.nsf.apu.dmc.DeltaModulationChannel;
+import lando.nsf.apu.noise.NoiseChannel;
+import lando.nsf.apu.pulse.PulseChannel;
+import lando.nsf.apu.triangle.TriangleChannel;
 import lando.nsf.cpu.CPU;
 
 public final class APU {
-
-	float output;
-	private int apuFlags;
-	
-	boolean square1Enabled = false;
-	boolean square2Enabled = false;
-	boolean triangleEnabled = false;
-	boolean noiseEnabled = false;
-	boolean dmcEnabled = false;
 	
 	final PulseChannel pulse1 = new PulseChannel(false);
 	final PulseChannel pulse2 = new PulseChannel(true);
@@ -25,38 +20,17 @@ public final class APU {
 	            cpu, pulse1, pulse2, triangle, noise, dmc);
 	}
 	
-	public void step() {
-		
-		computeOutput();
-	}
-	
-	public void computeOutput() {
+	public double getOutput() {
+	    
+	    int pulse1   = 0; //[0 15]
+        int pulse2   = 0; //[0 15]
 		int triangle = 0; //[0 15]
 		int noise    = 0; //[0 15]
-		int pulse1   = 0; //[0 15]
-		int pulse2   = 0; //[0 15]
 		int dmc      = 0; //[0 127]
 		
-		float pulseOut =  95.88f/( 8128f/(pulse1 + pulse2) + 100f );
-		float tndOut   = 159.79f/( 1f/(triangle/8227f + noise/12241f + dmc/22638f) + 100f );
+		double pulseOut =  95.88/( 8128.0/(pulse1 + pulse2) + 100.0 );
+		double tndOut   = 159.79/( 1f/(triangle/8227.0 + noise/12241.0 + dmc/22638.0) + 100f );
 		
-		this.output = pulseOut + tndOut;
-	}
-	
-	public void setApuFlags(int apuFlags) {
-		//do not set top 2 bits of first byte
-		this.apuFlags =
-				(this.apuFlags & 0xC0) | 
-				(     apuFlags & 0x1F); 
-		
-		square1Enabled  = (apuFlags & 0x01) != 0;
-		square2Enabled  = (apuFlags & 0x02) != 0;
-		triangleEnabled = (apuFlags & 0x04) != 0;
-		noiseEnabled    = (apuFlags & 0x08) != 0;
-		dmcEnabled      = (apuFlags & 0x10) != 0;
-	}
-
-	public int getApuFlags() {
-		return apuFlags;
+		return pulseOut + tndOut;
 	}
 }

@@ -1,4 +1,4 @@
-package lando.nsf.apu;
+package lando.nsf.apu.dmc;
 
 public final class DeltaModulationChannel {
 

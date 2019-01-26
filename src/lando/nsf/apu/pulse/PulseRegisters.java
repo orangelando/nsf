@@ -1,4 +1,4 @@
-package lando.nsf.apu;
+package lando.nsf.apu.pulse;
 
 import java.util.Objects;
 
@@ -17,6 +17,7 @@ public final class PulseRegisters {
     }
     
     public void writeReg1(int M) {
+        //$4000,$4004
         pulse.sequencer.setDuty(M >> 6);
         pulse.envelopeGenerator.loop = (M & ENVELOPE_LOOP_BIT) != 0;
         pulse.envelopeGenerator.disable = (M & ENVELOPE_DISABLE_BIT) != 0;
@@ -26,6 +27,7 @@ public final class PulseRegisters {
     }
     
     public void writeReg2(int M) {
+        //$4001,$4005
         pulse.sweep.enable = (M & SWEEP_ENABLE_BIT) != 0;
         pulse.sweep.negate = (M & SWEEP_NEGATE_BIT) != 0;
         pulse.sweep.divider.setPeriod( ((M>>4) & 7) + 1);
@@ -33,10 +35,12 @@ public final class PulseRegisters {
     }
     
     public void writeReg3(int M) {
+        //$4002,$4006
         pulse.timer.setLow8PeriodBits(M);
     }
     
     public void writeReg4(int M) {
+        //$4003,$4007
         pulse.lengthCounter.reload(M);
         pulse.envelopeGenerator.restartOnNextClock();
         pulse.timer.setUpper3PeriodBits(M);

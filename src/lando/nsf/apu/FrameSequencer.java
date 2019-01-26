@@ -2,6 +2,10 @@ package lando.nsf.apu;
 
 import java.util.Objects;
 
+import lando.nsf.apu.dmc.DeltaModulationChannel;
+import lando.nsf.apu.noise.NoiseChannel;
+import lando.nsf.apu.pulse.PulseChannel;
+import lando.nsf.apu.triangle.TriangleChannel;
 import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.IRQSource;
 
@@ -86,22 +90,22 @@ public final class FrameSequencer {
         switch(step++) {
         case 0:
             clearInterruptFlag();
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 1:
             clockLengthCountersAndSweepUnits();
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 2:
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 3:
             setInterruptFlag();
             clockLengthCountersAndSweepUnits();
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
         }
         
@@ -115,20 +119,20 @@ public final class FrameSequencer {
         switch(step++) {
         case 0:
             clockLengthCountersAndSweepUnits();
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 1:
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 2:
             clockLengthCountersAndSweepUnits();
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 3:
-            clockEnvelopesAndTriangleLinearCounter();
+            clockEnvelopesAndLinearCounters();
             break;
             
         case 4:
@@ -161,13 +165,17 @@ public final class FrameSequencer {
         pulse2.lengthCounter.clock();
         triangle.lengthCounter.clock();
         noise.lengthCounter.clock();
+        
+        pulse1.sweep.clock();
+        pulse2.sweep.clock();
     }
     
-    private void clockEnvelopesAndTriangleLinearCounter() {
+    private void clockEnvelopesAndLinearCounters() {
         pulse1.envelopeGenerator.clock();
         pulse2.envelopeGenerator.clock();
         triangle.envelopeGenerator.clock();
         noise.envelopeGenerator.clock();
         
+        triangle.linearCounter.clock();
     }
 }

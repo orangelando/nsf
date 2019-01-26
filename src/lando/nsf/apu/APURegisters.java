@@ -2,6 +2,11 @@ package lando.nsf.apu;
 
 import java.util.Objects;
 
+import lando.nsf.apu.dmc.DeltaModulationRegisters;
+import lando.nsf.apu.noise.NoiseRegisters;
+import lando.nsf.apu.pulse.PulseRegisters;
+import lando.nsf.apu.triangle.TriangleRegisters;
+
 public final class APURegisters {
     
     private static final int PULSE_1_STATUS_ADDR     = 0x4000;

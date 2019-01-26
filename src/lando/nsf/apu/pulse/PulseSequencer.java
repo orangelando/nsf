@@ -1,4 +1,4 @@
-package lando.nsf.apu;
+package lando.nsf.apu.pulse;
 
 public final class PulseSequencer {
     
