@@ -26,4 +26,9 @@ public final class DeltaModulationChannel {
         // TODO Auto-generated method stub
         
     }
+
+    public int getOutput() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

@@ -21,7 +21,7 @@ public final class LengthCounter {
             {0x20, 0x1E}};  // F
     
     private int count = 0;
-    private boolean disabled = true;
+    private boolean disabled = false;
     
     /**
      * The bottom 3 bits are ignored.
@@ -55,9 +55,11 @@ public final class LengthCounter {
     }
     
     public void clock() {
+        
         if( disabled ) {
             return;
         }
+        
         
         if( count > 0 ) {
             --count;
@@ -66,5 +68,9 @@ public final class LengthCounter {
     
     public int getCount() {
         return count;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
     }
 }

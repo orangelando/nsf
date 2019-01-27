@@ -10,10 +10,7 @@ import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.IRQSource;
 
 public final class FrameSequencer {
-    
-    //NES system clock is 21.47727 MHz
-    private static final int DIVIDER_PERIOD = 89490;
-    
+
     private final CPU cpu;
     private final PulseChannel pulse1;
     private final PulseChannel pulse2;
@@ -21,7 +18,8 @@ public final class FrameSequencer {
     private final NoiseChannel noise;
     private final DeltaModulationChannel dmc;
     
-    private int dividerCount = DIVIDER_PERIOD;
+    //NES system clock is 21.47727 MHz
+    private final Divider divider = new Divider(89490);
     private int step = 0;
     private Runnable sequence = this::clockMode4Sequence;
     private boolean disableInterrupts = true;
@@ -62,17 +60,9 @@ public final class FrameSequencer {
         disableInterrupts = true;
     }
     
-    /**
-     * 
-     * The divider generates an output clock rate of just under 240 Hz, and appears to
-     * be derived by dividing the 21.47727 MHz system clock by 89490. The sequencer is
-     * clocked by the divider's output.
-     * 
-     */
     public void clockDivider() {
-        if( --dividerCount <= 0 ) {
+        if( divider.clock() ) {
             sequence.run();
-            dividerCount = DIVIDER_PERIOD;
         }
     }
     
@@ -82,7 +72,7 @@ public final class FrameSequencer {
     
     public void resetDividerAndSequencer() {
         step = 0;
-        dividerCount = DIVIDER_PERIOD;
+        divider.reset();
     }
     
     private void clockMode4Sequence() {

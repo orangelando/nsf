@@ -131,28 +131,28 @@ public final class APURegisters {
         
         apu.dmc.clearInterrupt();
         
-        apu.noise   .lengthCounter.setDisabled( (M & 0b1000) != 0);
-        apu.triangle.lengthCounter.setDisabled( (M & 0b0100) != 0);
-        apu.pulse2  .lengthCounter.setDisabled( (M & 0b0010) != 0);
-        apu.pulse1  .lengthCounter.setDisabled( (M & 0b0001) != 0);
+        apu.noise   .lengthCounter.setDisabled( (M & 0b1000) == 0);
+        apu.triangle.lengthCounter.setDisabled( (M & 0b0100) == 0);
+        apu.pulse2  .lengthCounter.setDisabled( (M & 0b0010) == 0);
+        apu.pulse1  .lengthCounter.setDisabled( (M & 0b0001) == 0);
     }
         
     private void writeFrameCounterReg(int M) {
         //reset divider and sequencer
         //mi-- ---- mode, IRQ disable
-        int mode = (M>>7)&1;
-        int irqDisable = (M>>6)&1;
+        boolean mode       = ((M>>7)&1) != 0;
+        boolean irqDisable = ((M>>6)&1) != 0;
         
         apu.frameSequencer.resetDividerAndSequencer();
         
-        if( mode == 0 ) {
+        if( ! mode ) {
             apu.frameSequencer.select4StepMode();
         } else {
             apu.frameSequencer.select5StepMode();
             apu.frameSequencer.clockSequencer();
         }
         
-        if( irqDisable == 0 ) {
+        if( ! irqDisable ) {
             apu.frameSequencer.clearIRQDisable();
         } else {
             apu.frameSequencer.setIRQDisable();

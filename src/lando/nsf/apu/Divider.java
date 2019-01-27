@@ -6,7 +6,10 @@ public final class Divider {
     private int count = 0;
     
     public Divider() {
-        
+    }
+    
+    public Divider(int initialPeriod) {
+        setPeriod(initialPeriod);
     }
     
     public int getPeriod() {

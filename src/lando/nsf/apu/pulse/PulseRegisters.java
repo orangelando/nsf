@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public final class PulseRegisters {
     
+    private static final int LENGTH_ENABLE_BIT = 1<<5;
+    
     private static final int SWEEP_ENABLE_BIT = 0x80;
     private static final int SWEEP_NEGATE_BIT = 0x08;
     
@@ -23,7 +25,7 @@ public final class PulseRegisters {
         pulse.envelopeGenerator.disable = (M & ENVELOPE_DISABLE_BIT) != 0;
         pulse.envelopeGenerator.dividerPeriod = (M & 0xF) + 1;
         
-        //pulse.lengthCounter.setDisabled(flag);
+        pulse.lengthCounter.setDisabled( (M & LENGTH_ENABLE_BIT) == 0 );
     }
     
     public void writeReg2(int M) {
@@ -45,6 +47,5 @@ public final class PulseRegisters {
         pulse.envelopeGenerator.restartOnNextClock();
         pulse.timer.setUpper3PeriodBits(M);
         pulse.sequencer.setDuty(0);
-        //pulse.envelopeGenerator.
     }
 }

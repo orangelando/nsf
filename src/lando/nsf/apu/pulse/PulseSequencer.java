@@ -1,6 +1,6 @@
 package lando.nsf.apu.pulse;
 
-public final class PulseSequencer {
+final class PulseSequencer {
     
     private static final int[][] SEQUENCES = {
             {0, 1, 0, 0, 0, 0, 0, 0},

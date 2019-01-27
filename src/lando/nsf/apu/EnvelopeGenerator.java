@@ -6,10 +6,10 @@ public final class EnvelopeGenerator {
     
     public boolean disable = false;
     public boolean loop = false;
-    
     public int dividerPeriod = 1;
-    public int counter = 0;
-    public int divider = 0;
+    
+    private int counter = 0;
+    private int divider = 0;
     
     public void restartOnNextClock() {
         restartOnNextClock = true;
@@ -35,6 +35,7 @@ public final class EnvelopeGenerator {
     }
     
     public int getVolume() {
+        
         if( disable ) {
             return dividerPeriod - 1;
         }
