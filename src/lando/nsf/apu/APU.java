@@ -27,7 +27,7 @@ public final class APU {
 	public void clockChannelTimers() {
 	    pulse1.clockTimer();
 	    pulse2.clockTimer();
-	    //triangle.timer.clock();
+	    triangle.clockTimer();
 	    //noise.timer.clock();
 	    //dmc.timer.clock();
 	}

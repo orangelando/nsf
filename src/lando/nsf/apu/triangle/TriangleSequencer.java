@@ -1,6 +1,6 @@
 package lando.nsf.apu.triangle;
 
-public class TriangleSequencer {
+final class TriangleSequencer {
 
     private static final int[] SEQUENCE = {
             0xF, 0xE, 0xD, 0xC,
@@ -21,7 +21,7 @@ public class TriangleSequencer {
         ++step;
     }
     
-    public int getOutput() {
+    int getOutput() {
         return SEQUENCE[step & 31];
     }
 }

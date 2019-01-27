@@ -1,14 +1,11 @@
 package lando.nsf.initload;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -45,19 +42,21 @@ public final class FirstPlayTestApp {
         
         Divider cpuDivider = new Divider(12);
         
+        Divider samplerDivider = new Divider(30);
+        
         Path outPath = Paths.get(System.getProperty("user.home"), "Desktop", "out.raw");
         
         Path nsfDir = Paths.get("/Users/oroman/Desktop/stuff2/NSF-06-01-2011");
         Path path = nsfDir.resolve(
-              //"d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
-              "s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
+              "d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
+              //"s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
                 );
         
         NES nes = NES.buildForPathNoMemMonitor(path);
         
         out.println("num-songs: " + nes.nsf.header.totalSongs);
         
-        int songIndex = 1;
+        int songIndex = 0;
         nes.initTune(songIndex);
         
         nes.startInit();
@@ -106,6 +105,18 @@ public final class FirstPlayTestApp {
                     
                     nes.apu.clockFrameSequencer();
         
+                    /*
+                    if( samplerDivider.clock() ) {
+                        int sample = Float.floatToIntBits((float)nes.apu.getOutput());
+                        
+                        bout.write((sample>> 0)&255);
+                        bout.write((sample>> 8)&255);
+                        bout.write((sample>>16)&255);
+                        bout.write((sample>>24)&255);
+                    }
+                    */
+                    
+                    //*
                     audioAccumulator += nes.apu.getOutput();
                     
                     if( audioDivider.clock() ) {
@@ -122,6 +133,7 @@ public final class FirstPlayTestApp {
                         
                         audioAccumulator = 0;
                     }
+                    //*/
                 }
                 
                 systemCycle += cycles;

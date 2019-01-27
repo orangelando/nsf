@@ -16,7 +16,7 @@ public final class TriangleRegisters {
         //$4008
         boolean counterControl = (M & COUNTER_CONTROL_BIT) != 0;
         
-        triangle.lengthCounter.setDisabled(counterControl);
+        triangle.lengthCounter.setDisabled(! counterControl);
         
         triangle.linearCounter.control = counterControl;
         triangle.linearCounter.setReload(M);
@@ -37,8 +37,8 @@ public final class TriangleRegisters {
         //$400B
         triangle.timer.setUpper3PeriodBits(M);
         triangle.lengthCounter.reload(M);
-        triangle.envelopeGenerator.restartOnNextClock();
         triangle.linearCounter.reload(M);
+        triangle.linearCounter.halt = true;
     }
 
 }
