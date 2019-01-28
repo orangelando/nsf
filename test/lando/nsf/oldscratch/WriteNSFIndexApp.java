@@ -1,4 +1,4 @@
-package lando.nsf.app;
+package lando.nsf.oldscratch;
 
 import static lando.nsf.DisassemblerUtils.opCodeText;
 import static lando.nsf.cpu.StringUtils.toHex2;

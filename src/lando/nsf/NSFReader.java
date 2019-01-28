@@ -27,7 +27,7 @@ public final class NSFReader {
 		reader.copy(0, header.nesm, 0, 5);
 		header.versionNumber = reader.readByte(0x5);
 		
-		Validate.isTrue( equals(header.nesm, 0, NESM, 0, 5) );
+		Validate.isTrue( equals(header.nesm, 0, NESM, 0, 5), "First five file bytes are not 'NESM\\n'" );
 		//Validate.isTrue( header.versionNumber == 1 );
 		
 		header.totalSongs      = reader.readByte(0x6);

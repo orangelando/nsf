@@ -1,4 +1,4 @@
-package lando.nsf.app;
+package lando.nsf.oldscratch;
 
 import lando.nsf.HexUtils;
 import lando.nsf.NESMem;

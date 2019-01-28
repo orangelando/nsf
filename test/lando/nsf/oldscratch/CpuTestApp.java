@@ -1,4 +1,4 @@
-package lando.nsf.app;
+package lando.nsf.oldscratch;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
