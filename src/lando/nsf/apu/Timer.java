@@ -15,6 +15,10 @@ public final class Timer {
         return period;
     }
     
+    public void setPeriod(int p) {
+        period = p;
+    }
+    
     private void setPeriod() {
         period = ( (upper3<<8) | low8 ) + 1;
     }

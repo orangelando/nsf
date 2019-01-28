@@ -48,11 +48,16 @@ public final class FirstPlayTestApp {
         
         Path nsfDir = Paths.get("/Users/oroman/Desktop/stuff2/NSF-06-01-2011");
         Path path = nsfDir.resolve(
-              "d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
-              //"s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
+              //"d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
+              "s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
                 );
         
         NES nes = NES.buildForPathNoMemMonitor(path);
+        
+        nes.apu.setPulse1Enabled  (true );
+        nes.apu.setPulse2Enabled  (true );
+        nes.apu.setTriangleEnabled(true );
+        nes.apu.setNoiseEnabled   (true );
         
         out.println("num-songs: " + nes.nsf.header.totalSongs);
         

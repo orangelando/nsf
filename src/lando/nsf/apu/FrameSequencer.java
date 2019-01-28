@@ -163,7 +163,6 @@ public final class FrameSequencer {
     private void clockEnvelopesAndLinearCounters() {
         pulse1.envelopeGenerator.clock();
         pulse2.envelopeGenerator.clock();
-        //triangle.envelopeGenerator.clock();
         noise.envelopeGenerator.clock();
         
         triangle.linearCounter.clock();

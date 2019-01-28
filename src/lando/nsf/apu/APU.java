@@ -14,10 +14,36 @@ public final class APU {
 	final NoiseChannel noise = new NoiseChannel();
 	final DeltaModulationChannel dmc = new DeltaModulationChannel();
 	final FrameSequencer frameSequencer;
+	
+	private boolean pulse1Enabled = true;
+	private boolean pulse2Enabled = true;
+	private boolean triangleEnabled = true;
+	private boolean noiseEnabled = true;
+	private boolean dmcEnabled = true;
 		
 	public APU(CPU cpu) {
 	    this.frameSequencer = new FrameSequencer(
 	            cpu, pulse1, pulse2, triangle, noise, dmc);
+	}
+	
+	public void setPulse1Enabled(boolean flag) {
+	    pulse1Enabled = flag;
+	}
+	
+	public void setPulse2Enabled(boolean flag) {
+        pulse2Enabled = flag;
+    }
+	
+	public void setTriangleEnabled(boolean flag) {
+        triangleEnabled = flag;
+    }
+	
+	public void setNoiseEnabled(boolean flag) {
+        noiseEnabled = flag;
+    }
+	
+	public void setDmcEnabled(boolean flag) {
+	    dmcEnabled = flag;
 	}
 	
 	public void clockFrameSequencer() {
@@ -28,8 +54,7 @@ public final class APU {
 	    pulse1.clockTimer();
 	    pulse2.clockTimer();
 	    triangle.clockTimer();
-	    //noise.timer.clock();
-	    //dmc.timer.clock();
+	    noise.clockTimer();
 	}
 	
 	/**
@@ -37,11 +62,11 @@ public final class APU {
 	 */
 	public double getOutput() {
 	    
-	    int pulse1Val   = pulse1  .getOutput(); //[0 15]
-        int pulse2Val   = pulse2  .getOutput(); //[0 15]
-		int triangleVal = triangle.getOutput(); //[0 15]
-		int noiseVal    = noise   .getOutput(); //[0 15]
-		int dmcVal      = dmc     .getOutput(); //[0 127]
+	    int pulse1Val   = pulse1Enabled   ? pulse1  .getOutput() : 0; //[0 15]
+        int pulse2Val   = pulse2Enabled   ? pulse2  .getOutput() : 0; //[0 15]
+		int triangleVal = triangleEnabled ? triangle.getOutput() : 0; //[0 15]
+		int noiseVal    = noiseEnabled    ? noise   .getOutput() : 0; //[0 15]
+		int dmcVal      = dmcEnabled      ? dmc     .getOutput() : 0; //[0 127]
 		
 		double pulseOut =  95.88/( 8128.0/(pulse1Val + pulse2Val) + 100.0 );
 		double tndOut   = 159.79/( 1f/(triangleVal/8227.0 + noiseVal/12241.0 + dmcVal/22638.0) + 100.0 );
