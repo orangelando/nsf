@@ -1,0 +1,10 @@
+
+ * finish adding wav functionality.
+ 
+ * move inittest play app out of test and into main src tree. 
+ 
+ * make spectrogram app operate on a dir to examine multiple songs quickly.
+   
+ * research how to properly implement high pass filter.
+   
+ * triangle wave does not sound right!
