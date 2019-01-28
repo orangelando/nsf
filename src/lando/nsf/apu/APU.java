@@ -60,7 +60,7 @@ public final class APU {
 	/**
 	 * returns a value in the range [0, 1]
 	 */
-	public double getOutput() {
+	public float getOutput() {
 	    
 	    int pulse1Val   = pulse1Enabled   ? pulse1  .getOutput() : 0; //[0 15]
         int pulse2Val   = pulse2Enabled   ? pulse2  .getOutput() : 0; //[0 15]
@@ -68,16 +68,16 @@ public final class APU {
 		int noiseVal    = noiseEnabled    ? noise   .getOutput() : 0; //[0 15]
 		int dmcVal      = dmcEnabled      ? dmc     .getOutput() : 0; //[0 127]
 		
-		double pulseOut =  95.88/( 8128.0/(pulse1Val + pulse2Val) + 100.0 );
-		double tndOut   = 159.79/( 1f/(triangleVal/8227.0 + noiseVal/12241.0 + dmcVal/22638.0) + 100.0 );
-		double out      = pulseOut + tndOut;
+		float pulseOut =  95.88f/( 8128f/(pulse1Val + pulse2Val) + 100f );
+		float tndOut   = 159.79f/( 1f/(triangleVal/8227f + noiseVal/12241f + dmcVal/22638f) + 100f );
+		float out      = pulseOut + tndOut;
 				
-		if( out < 0.0 ) {
-		    return 0.0;
+		if( out < 0.0f ) {
+		    return 0.0f;
 		}
 		
-		if( out > 1.0 ) {
-		    return 1.0;
+		if( out > 1.0f ) {
+		    return 1.0f;
 		}
 		
 		return out;

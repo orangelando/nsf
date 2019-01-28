@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -41,7 +39,7 @@ public final class LandoNSFInfoApp {
         } catch(CmdLineException e) {
             System.err.println(e.getMessage());
             cmdParser.printUsage(System.err);
-            return;
+            System.exit(1);
         }
         
         app.exec(out);
