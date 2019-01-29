@@ -12,11 +12,11 @@ import org.apache.commons.lang3.Validate;
 import lando.nsf.apu.Divider;
 
 public final class NSFRenderer {
-
-    private final PrintStream out = System.out;
     
     //NES system clock rate
-    private final long systemCyclesPerSec = 21_477_270; 
+    public static final long SYSTEM_CYCLES_PER_SEC = 21_477_270;
+
+    private final PrintStream out = System.out;
     
     //both the NES CPU and APU timers run off the
     //system clock divded by 12 or ~1.79MHz
@@ -44,8 +44,8 @@ public final class NSFRenderer {
         this.nes = Objects.requireNonNull(nes);
         this.outFmt = Objects.requireNonNull(outFmt);
         
-        this.maxSystemCycles = systemCyclesPerSec*maxPlaySecs;
-        this.maxSilenceCycles = systemCyclesPerSec*maxSilenceSecs;
+        this.maxSystemCycles = SYSTEM_CYCLES_PER_SEC*maxPlaySecs;
+        this.maxSilenceCycles = SYSTEM_CYCLES_PER_SEC*maxSilenceSecs;
         this.playPeriodFinder = createPlayPeriodFinder();
     }
 
@@ -65,7 +65,7 @@ public final class NSFRenderer {
             cpuDivider.reset();
             nextCycleToPlay = playPeriodFinder.findNextPeriod(0);
 
-            SampleConsumer sc = createSampleConsumer(bout);
+            APUSampleConsumer sc = createSampleConsumer(bout);
             
             sc.init();
             
@@ -77,7 +77,7 @@ public final class NSFRenderer {
         }
     }
     
-    private SampleConsumer createSampleConsumer(BufferedOutputStream bout) {
+    private APUSampleConsumer createSampleConsumer(BufferedOutputStream bout) {
         
         switch(outFmt) {
         case system_raw: return new RawConsumer(30, bout);
@@ -93,7 +93,7 @@ public final class NSFRenderer {
         out.println("playPeriodNanos: " + playPeriodNanos);
         
         long playPeriodSystemCycles = (long)Math.round(
-                playPeriodNanos/(1e9/systemCyclesPerSec));   
+                playPeriodNanos/(1e9/SYSTEM_CYCLES_PER_SEC));   
         
         out.println("playPeriodSystemCycles: " + playPeriodSystemCycles);
         
@@ -103,7 +103,7 @@ public final class NSFRenderer {
     /*
      * returns number of cycles that elapsed.
      */
-    private int step(SampleConsumer sampleConsumer) throws Exception {
+    private int step(APUSampleConsumer sampleConsumer) throws Exception {
         int cycles;
         
         if( systemCycle >= nextCycleToPlay ) {

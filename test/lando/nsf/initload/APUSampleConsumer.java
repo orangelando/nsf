@@ -1,6 +1,6 @@
 package lando.nsf.initload;
 
-interface SampleConsumer {
+interface APUSampleConsumer {
     
     void init() throws Exception ;
     

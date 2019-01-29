@@ -8,7 +8,7 @@ import lando.nsf.apu.Divider;
 /**
  * Outputs raw 32-bit float samples average every N samples.
  */
-final class RawConsumer implements SampleConsumer {
+final class RawConsumer implements APUSampleConsumer {
 
     private final Divider audioDivider;
     private final OutputStream bout;
