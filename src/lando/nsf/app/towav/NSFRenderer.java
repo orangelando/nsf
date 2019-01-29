@@ -14,20 +14,23 @@ import lando.nsf.apu.Divider;
 public final class NSFRenderer {
     
     //NES system clock rate
-    public static final long SYSTEM_CYCLES_PER_SEC = 21_477_270;
-
+    public static final int SYSTEM_CYCLES_PER_SEC = 21_477_270;
+    
     private final PrintStream out = System.out;
     
     //both the NES CPU and APU timers run off the
     //system clock divded by 12 or ~1.79MHz
     private final Divider cpuDivider = new Divider(12);
-    
+        
     private final NES nes;
     private final OutputFmt outFmt;
     
     private final long maxSystemCycles;
-    private final long maxSilenceCycles;
+    private final long fadeOutStartCycle;
+    private final boolean disableFadeOut;
+    
     private final PeriodTimestampFinder playPeriodFinder;
+    private final SilenceDetector silenceDetector;
     
     private long systemCycle;
     private long nextCycleToPlay;
@@ -45,7 +48,9 @@ public final class NSFRenderer {
         this.outFmt = Objects.requireNonNull(outFmt);
         
         this.maxSystemCycles = SYSTEM_CYCLES_PER_SEC*maxPlaySecs;
-        this.maxSilenceCycles = SYSTEM_CYCLES_PER_SEC*maxSilenceSecs;
+        this.fadeOutStartCycle = this.maxSystemCycles - SYSTEM_CYCLES_PER_SEC; //1 second fade out
+        this.disableFadeOut = this.fadeOutStartCycle <= SYSTEM_CYCLES_PER_SEC; //do not fade out if max play is <= 1 second.
+        this.silenceDetector = new SilenceDetector(SYSTEM_CYCLES_PER_SEC*maxSilenceSecs);
         this.playPeriodFinder = createPlayPeriodFinder();
     }
 
@@ -63,6 +68,7 @@ public final class NSFRenderer {
 
             systemCycle = 0;
             cpuDivider.reset();
+            silenceDetector.reset();
             nextCycleToPlay = playPeriodFinder.findNextPeriod(0);
 
             APUSampleConsumer sc = createSampleConsumer(bout);
@@ -71,6 +77,10 @@ public final class NSFRenderer {
             
             while(systemCycle < maxSystemCycles) {                
                 systemCycle += step(sc);
+                
+                if( silenceDetector.wasSilenceDetected() ) {
+                    break;
+                }
             }
             
             sc.finish();
@@ -80,7 +90,7 @@ public final class NSFRenderer {
     private APUSampleConsumer createSampleConsumer(BufferedOutputStream bout) {
         
         switch(outFmt) {
-        case system_raw: return new RawConsumer(30, bout);
+        case system_raw: return new RawConsumer(1, bout);
         case wav_16_441: return new WavConsumer(bout);
         }
         
@@ -125,7 +135,16 @@ public final class NSFRenderer {
             
             nes.apu.clockFrameSequencer();
             
-            sampleConsumer.consume(nes.apu.getOutput());
+            float sample = nes.apu.getOutput();
+
+            silenceDetector.addSample(sample);
+            
+            if( ! disableFadeOut && systemCycle >= fadeOutStartCycle ) {
+                float scale = 1f - (float)(systemCycle - fadeOutStartCycle)/(maxSystemCycles - fadeOutStartCycle);
+                sample *= scale;
+            }
+            
+            sampleConsumer.consume(sample);
         }
         
         return cycles;
