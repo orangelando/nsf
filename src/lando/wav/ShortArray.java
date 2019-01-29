@@ -1,8 +1,16 @@
-package lando.pcm.wav;
+package lando.wav;
 
 public final class ShortArray {
-	public short[] array = new short[0];
-	public int size = 0;
+	private short[] array = new short[0];
+	private int size = 0;
+	
+	public short[] getArray() {
+	    return array;
+	}
+	
+	public int getSize() {
+	    return size;
+	}
 	
 	public void append(short s) {
 		if( size >= array.length ) {
