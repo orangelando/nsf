@@ -16,7 +16,7 @@ import org.kohsuke.args4j.Option;
 
 import lando.nsf.NSFHeader;
 
-public final class FirstPlayTestApp {
+public final class LandoNSF2WAVApp {
     
     private static final String TRACK_NUM_OPT = "-trackNum";
     private static final String ALL_TRACKS_OPT = "-allTracks";
@@ -47,7 +47,7 @@ public final class FirstPlayTestApp {
     
     public static void main(String [] args) throws Exception {
         
-        FirstPlayTestApp app = new FirstPlayTestApp();
+        LandoNSF2WAVApp app = new LandoNSF2WAVApp();
         CmdLineParser cmdParser = new CmdLineParser(app);
         
         try {
