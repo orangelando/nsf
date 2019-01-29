@@ -10,22 +10,22 @@ public class TrackNumAdderTest {
 
     @Test
     public void insert_num() {
-        test("/Foo/bar/baz.raw", "/Foo/bar/baz.001.raw");
+        test("/Foo/bar/baz.raw", "/Foo/bar/baz-01.raw");
     }
     
     @Test
     public void dot_at_end() {
-        test("/Foo/bar/baz.", "/Foo/bar/baz.001");
+        test("/Foo/bar/baz.", "/Foo/bar/baz-01.");
     }
     
     @Test
     public void dot_at_start() {
-        test("/Foo/bar/.baz", "/Foo/bar/.baz.001");
+        test("/Foo/bar/.baz", "/Foo/bar/.baz-01");
     }
     
     @Test
     public void not_dot_at_all() {
-        test("/Foo/bar/baz", "/Foo/bar/baz.001");
+        test("/Foo/bar/baz", "/Foo/bar/baz-01");
     }
     
     private void test(String inFile, String expected) {

@@ -17,7 +17,7 @@ public final class TriangleChannel {
         }
         
         if( ! lengthCounter.isDisabled() && lengthCounter.getCount() == 0 ) {
-            return;
+        //    return;
         }
         
         if( linearCounter.counter == 0 ) {

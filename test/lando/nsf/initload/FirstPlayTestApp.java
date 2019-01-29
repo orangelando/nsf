@@ -7,11 +7,14 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+
+import lando.nsf.NSFHeader;
 
 public final class FirstPlayTestApp {
     
@@ -40,7 +43,7 @@ public final class FirstPlayTestApp {
     private int maxSilenceSecs=3;
     
     @Option(name="-outFmt", required=false, usage="system_raw(21.47727mhz, 32bit float, raw apu output), wav_16_441(44.1khz, signed 16bit pcm wav file)")
-    private OutputFmt outFmt = OutputFmt.system_raw;
+    private OutputFmt outFmt = OutputFmt.wav_16_441;
     
     public static void main(String [] args) throws Exception {
         
@@ -78,7 +81,8 @@ public final class FirstPlayTestApp {
         }
         
         NES nes = NES.buildForPathNoMemMonitor(path);
-        out.println("num-songs: " + nes.nsf.header.totalSongs);
+        
+        printNSFInfo(out, nes.nsf.header);
         
         List<TrackArg> tracksToRender = buildTracksToRender(nes);
         
@@ -104,6 +108,22 @@ public final class FirstPlayTestApp {
         }
         
         out.println("done");
+    }
+
+    private void printNSFInfo(PrintStream out, NSFHeader header) {
+        
+        out.printf("Song Name         : %s%n", header.songName);
+        out.printf("Artist Name       : %s%n", header.artistName);
+        out.printf("Copyright         : %s%n", header.copyrightHolder);
+        out.printf("Total Songs       : %s%n", header.totalSongs);
+        out.printf("Starting Song     : %s%n", header.startingSong);
+        out.printf("Init Banks        : %s%n", Arrays.toString(header.bankswitchInitValues));
+        out.printf("NTSC/PAL          : %s%n", header.getNtscPalMode());
+        out.printf("Extra Sound Chips : %s%n", header.getSupportedExtraSoundChips());
+        
+        if( ! header.getSupportedExtraSoundChips().isEmpty() ) {
+            out.println("WARNING: extra sound chips not supported!");
+        }
     }
 
     private List<TrackArg> buildTracksToRender(NES nes) {

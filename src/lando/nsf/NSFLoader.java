@@ -2,7 +2,6 @@ package lando.nsf;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,21 +23,17 @@ public final class NSFLoader {
     }
 
     public void loadNSF() {
-        out.println("loading " + nsf.header.songName);
         
         Validate.isTrue(
                 nsf.header.loadDataAddr == (nsf.header.loadDataAddr&0xFFFF));
         
         if( nsf.isBanked() ) {
-            out.println("    banked " + Arrays.toString(nsf.header.bankswitchInitValues));
-            
             if( ! nsf.isFDS() ) {
                 loadBankedROM();
             } else {
                 throw new UnsupportedOperationException("FDS bank switching not supported.");
             }
         } else {
-            out.println("    non-banked");
             loadNonBankedROM();
         }
     }

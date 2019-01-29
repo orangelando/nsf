@@ -49,6 +49,7 @@ public final class NESMem implements Memory {
 	    }
 	    
 	    this.banks = banks;
+	    this.isBankSwitching = true;
 	}
 
 	@Override

@@ -45,6 +45,6 @@ final class WavConsumer implements APUSampleConsumer {
 
     @Override
     public void finish() throws Exception {
-        new WAVWriter(bout).writePCM(shorts);
+        new WAVWriter(bout).write(shorts);
     }
 }

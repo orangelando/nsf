@@ -18,14 +18,14 @@ public final class WAVWriter {
         this.out = Objects.requireNonNull(out);
     }
     
-    public void writePCM(ShortArray samples) throws Exception {
+    public void write(ShortArray samples) throws Exception {
         Validate.notNull(samples);
         
         //XXX: this doubles head usage!
         byte[] bytes = convertToBytes(samples.getArray(), samples.getSize());
         int numBytes = samples.getSize()*2;
         
-        Validate.isTrue(bytes.length == numBytes);
+        Validate.isTrue(bytes.length == numBytes, bytes.length + " != " + numBytes);
         
         writeASCII ("RIFF");
         writeUInt32(4+8+16+8+numBytes);
@@ -50,6 +50,7 @@ public final class WAVWriter {
         
         /**
          * WAV blocks must be short aligned.
+         * XXX: but we're writing shorts so this should always be true!
          */
         if( numBytes % 2 != 0 ) {
             out.write(0);
@@ -76,7 +77,7 @@ public final class WAVWriter {
     }
     
     private static byte[] convertToBytes(short[] shorts, int numShorts) {        
-        byte[] bytes = new byte[shorts.length*2];
+        byte[] bytes = new byte[numShorts*2];
         
         convertToBytes(shorts, 0, numShorts, bytes, 0);
         
