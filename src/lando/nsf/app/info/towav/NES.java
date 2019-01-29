@@ -1,4 +1,4 @@
-package lando.nsf.initload;
+package lando.nsf.app.info.towav;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +14,9 @@ import lando.nsf.apu.APU;
 import lando.nsf.cpu.CPU;
 import lando.nsf.cpu.Memory;
 
-final class NES {
+public final class NES {
 
-    static NES buildForPath(
+    public static NES buildForPath(
             Path path,
             Function<Memory, Memory> memDecorator
             ) throws Exception {
@@ -39,7 +39,7 @@ final class NES {
         return new NES(nsf, apu, mem, loader, cpu);
     }
     
-    static NES buildForPathNoMemMonitor(Path path) throws Exception {
+    public static NES buildForPathNoMemMonitor(Path path) throws Exception {
         byte[] bytes = Files.readAllBytes(path);
         
         NSF nsf = NSFReader.readNSF(bytes);
@@ -58,15 +58,15 @@ final class NES {
     }
 
     
-    final int stopAddr = CPU.RESET_VECTOR_ADDR;
-    final AtomicInteger numInstrs = new AtomicInteger(0);
-    final AtomicInteger numCycles = new AtomicInteger(0);
+    public final int stopAddr = CPU.RESET_VECTOR_ADDR;
+    public final AtomicInteger numInstrs = new AtomicInteger(0);
+    public final AtomicInteger numCycles = new AtomicInteger(0);
     
-    final NSF nsf;
-    final APU apu;
-    final NESMem mem;
-    final NSFLoader loader;
-    final CPU cpu;
+    public final NSF nsf;
+    public final APU apu;
+    public final NESMem mem;
+    public final NSFLoader loader;
+    public final CPU cpu;
     
     NES(NSF nsf, APU apu, NESMem mem, NSFLoader loader, CPU cpu) {
         this.nsf    = Objects.requireNonNull(nsf);
@@ -76,7 +76,7 @@ final class NES {
         this.cpu    = Objects.requireNonNull(cpu);
     }
     
-    void initTune(int songIndex) {
+    public void initTune(int songIndex) {
         mem.clearMem(0x0000, 0x07ff);
         mem.clearMem(0x6000, 0x7fff);
         mem.initAPU();
@@ -84,15 +84,15 @@ final class NES {
         loader.initTune(cpu, songIndex);
     }
     
-    void startInit() {
+    public void startInit() {
         loader.startInit(cpu, stopAddr);
     }
     
-    void startPlay() {
+    public void startPlay() {
         loader.startPlay(cpu, stopAddr);
     }
     
-    void runRoutine() {
+    public void runRoutine() {
         numInstrs.set(0);
         numCycles.set(0);
 
