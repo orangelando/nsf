@@ -2,9 +2,7 @@ package lando.nsf.spectrogram;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +23,9 @@ public final class GenerateSpectrogramApp {
     
     private void exec() throws Exception {
         PrintStream out = System.err;
-        Path path = Paths.get("/Users/oroman/Desktop/out.raw");
+        Path path = Paths.get(
+                "/Users/oroman/Desktop/nsf-out/out-03.raw"
+                );
         
         float[] samples = readAllSamples(path);
         out.println("numSamples: " + samples.length);
@@ -77,7 +77,7 @@ public final class GenerateSpectrogramApp {
                 
                 int r = (int)Math.round(Math.pow(u, 2.00)*255);
                 int g = (int)Math.round(Math.pow(u, 1.00)*255);
-                int b = (int)Math.round(Math.pow(u, 0.02)*255);
+                int b = (int)Math.round(Math.pow(u, 0.20)*255);
                 
                 int c = ((r<<16)&0xFF_00_00) | 
                         ((g<< 8)&0x00_FF_00) |
