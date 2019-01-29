@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import lando.nsf.app.info.towav.NES;
+import lando.nsf.app.towav.NES;
 
 public final class TestPlaybackApp {
 

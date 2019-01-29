@@ -12,7 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import lando.nsf.NESMem;
-import lando.nsf.app.info.towav.NES;
+import lando.nsf.app.towav.NES;
 import lando.nsf.cpu.CPU;
 import lando.nsf.gui.Dissassembler;
 import lando.nsf.gui.MemoryMonitor;
