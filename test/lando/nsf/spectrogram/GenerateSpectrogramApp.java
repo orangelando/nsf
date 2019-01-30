@@ -102,7 +102,7 @@ public final class GenerateSpectrogramApp {
         out.println("done");
     }
     
-    private float[] readAllSamples(Path path) throws Exception {
+    public static float[] readAllSamples(Path path) throws Exception {
         long fileSize = Files.size(path);
         
         Validate.isTrue( fileSize <= Integer.MAX_VALUE, "File size must be less than 4 GiB");
