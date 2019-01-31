@@ -1,12 +1,10 @@
 package lando.nsf.dspscratch;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.ceil;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 import static lando.nsf.spectrogram.GenerateSpectrogramApp.readAllSamples;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -19,14 +17,21 @@ import org.apache.commons.lang3.Validate;
 import lando.dsp.SimpleDsp;
 import lando.nsf.app.towav.SampleRingBuffer;
 
-public class FilterTestApp {
+public class FixedPointTestApp {
 
     public static void main(String [] args) throws Exception {
         PrintStream out = System.err;
+        
+        out.println("started");
+        
         int samplesPerSec = 44_100;
         
         float[] samples = readAllSamples(
                 Paths.get("/Users/oroman/Desktop/test.raw"));
+        
+        out.println("loaded");
+        
+        printStats(samples);
         
         out.printf("read %d samples or %s%n", 
                 samples.length, 
@@ -36,11 +41,33 @@ public class FilterTestApp {
         
         out.println("filtered");
         
+        printStats(samples);
+        
+        short[] pcm = new short[samples.length];
+        
+        for(int i = 0; i < samples.length; i++) {
+            pcm[i] = (short)(samples[i]*32767);
+        }
+        
+        out.println("converted...");
+        
         writeAllSamples(
-                samples, 
+                pcm, 
                 Paths.get("/Users/oroman/Desktop/filtered.raw"));
         
         out.println("done");
+    }
+    
+    private static void printStats(float[] samples) {
+        float max = Float.MIN_VALUE;
+        float min = Float.MAX_VALUE;
+        
+        for(float s: samples) {
+            max = Float.max(max, s);
+            min = Float.min(min, s);
+        }
+        
+        System.err.println("min: " + min + ", max: " + max);
     }
     
     private static void filter(int samplesPerSec, float[] x) {
@@ -51,11 +78,11 @@ public class FilterTestApp {
         
         SimpleDsp dsp = new SimpleDsp();
         
-        //float[] highpass = dsp.createHighPass(samplesPerSec, 0, 440);
-        //float[] lowpass  = dsp.createLowPass(samplesPerSec, 14_000, 36_000);
-        //float[] filter = dsp.convolve(highpass, lowpass);
+        float[] highpass = dsp.createHighPass(samplesPerSec, 0, 440);
+        float[] lowpass  = dsp.createLowPass(samplesPerSec, 14_000, 36_000);
+        float[] filter = dsp.convolve(highpass, lowpass);
         
-        float[] filter = dsp.createLowPass(samplesPerSec,  14_000, 36_000);
+        //float[] filter = dsp.createLowPass(samplesPerSec,  14_000, 36_000);
         SampleRingBuffer buf = new SampleRingBuffer(filter.length);
         
         System.err.println("filter: " + filter.length);
@@ -65,7 +92,7 @@ public class FilterTestApp {
         for(int i = 0; i < x.length; i++) {
             
             if( i % 100000 == 0 ) {
-                System.err.println(i);
+                //System.err.println(i);
             }
             
             buf.add(x[i]);
@@ -90,55 +117,15 @@ public class FilterTestApp {
         System.arraycopy(y, 0, x, 0, x.length);
     }
     
-    public static void writeAllSamples(float[] samples, Path p) throws Exception {
+    
+    public static void writeAllSamples(short[] samples, Path p) throws Exception {
         try(OutputStream os = Files.newOutputStream(p);
             BufferedOutputStream bos = new BufferedOutputStream(os)) {
             
-            for(float s: samples) {
-                int i = Float.floatToIntBits(s);
-                
-                bos.write( (i>> 0) & 255 );
-                bos.write( (i>> 8) & 255 );
-                bos.write( (i>>16) & 255 );
-                bos.write( (i>>24) & 255 );
+            for(short s: samples) {
+                bos.write( (s>> 0) & 255 );
+                bos.write( (s>> 8) & 255 );
             }
         }
-    }
-}
-
-final class AvgBuf {
-
-    private final float[] samples;
-    private int start;
-    private float total;
-    //private float prevSample;
-    
-    AvgBuf(int size) {
-        Validate.isTrue(size > 0);
-        this.samples = new float[size];
-        this.start = 0;
-        this.total = 0;
-        //this.prevSample = 0;
-    }
-    
-    int size() {
-        return samples.length;
-    }
-    
-    public void add(float newSample) {
-        float evictedSample = samples[start];
-                
-        samples[start++] = newSample;
-        
-        if( start == samples.length ) {
-            start = 0;
-        }
-        
-        total += newSample - evictedSample;
-        //prevSample = newSample;
-    }
-    
-    float avg() {
-        return total/samples.length;
     }
 }

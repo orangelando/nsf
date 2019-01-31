@@ -25,6 +25,7 @@ final class WavConsumer implements APUSampleConsumer {
     private float accumulator = 0;
     private ShortArray shorts = new ShortArray();
     private float[] filter;
+    private SampleRingBuffer samples;
     
     WavConsumer(OutputStream bout) {
         this.bout = bout;
@@ -35,9 +36,11 @@ final class WavConsumer implements APUSampleConsumer {
         SimpleDsp dsp = new SimpleDsp();
         
         float[] highpass = dsp.createHighPass(WAV_SAMPLES_PER_SEC, 0, 440);
-        float[] lowpass  = dsp.createLowPass (WAV_SAMPLES_PER_SEC, 14_000, 36_000);
+        float[] lowpass  = dsp.createLowPass (WAV_SAMPLES_PER_SEC, 14_000, 26_000);
         
         filter = dsp.convolve(highpass, lowpass);
+                
+        samples = new SampleRingBuffer(filter.length);
     }
 
     @Override
@@ -56,10 +59,23 @@ final class WavConsumer implements APUSampleConsumer {
                 accumulator = 0;
             }
             
-            shorts.append( (short)(accumulator*65535 - 32768) );
+            samples.add(accumulator);
+            
+            shorts.append( (short)(filtered()*32767) );
             
             accumulator = 0;
         }
+    }
+    
+    private float filtered() {
+       
+        float a = 0;
+        
+        for(int i = 0; i < filter.length; i++) {
+            a += filter[filter.length - 1 - i]*samples.samples[(samples.next + i)%filter.length];
+        }
+        
+        return a;
     }
 
     @Override
