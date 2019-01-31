@@ -1,10 +1,47 @@
-
- * finish adding wav functionality.
  
- * move inittest play app out of test and into main src tree. 
- 
- * make spectrogram app operate on a dir to examine multiple songs quickly.
-   
- * research how to properly implement high pass filter.
+ * add option to split out individual channels
    
  * triangle wave does not sound right!
+ 
+ * start on DMC channel
+ 
+ * make everything sound right!
+ 
+ * how to package and run from command line? Make a maven target to 
+   create a fat jar.
+ 
+ * get this thing on github!
+
+ 
+ -- TAKE A BREAK -- 
+ 
+ * capture APU writes and try to output something higher level.
+   perhaps implement a higherlevel APU that outputs sound samples
+   for each "period" basic on the current state of registers and whatever
+   updates have occurred.
+   
+   while( time <= maxTime ) {
+   
+       generateAPUSamples();
+       runPlayRoutine();
+   
+       time += playPeriodTime;
+   }
+   
+  * output apu changes to impulse tracker stuff
+  
+    https://www.youtube.com/watch?v=Hvx4xXhZMrU
+    
+    https://www.youtube.com/watch?v=1M-vd52gwtM
+    
+    Impulse/Schism Tracker
+        http://schismtracker.org/
+    
+    Open Mod Pulse Tracker: 
+        https://openmpt.org/
+    
+ * ".itm" or impulse tracker files to midi to generate a score?
+ 
+ Creating something that converts between itm vs midi might be a project on it's own.
+      
+      
