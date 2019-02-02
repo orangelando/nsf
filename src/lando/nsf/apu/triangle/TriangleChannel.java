@@ -17,7 +17,7 @@ public final class TriangleChannel {
         }
         
         if( ! lengthCounter.isDisabled() && lengthCounter.getCount() == 0 ) {
-        //    return;
+            return;
         }
         
         if( linearCounter.counter == 0 ) {
@@ -28,6 +28,10 @@ public final class TriangleChannel {
     }
     
     public int getOutput() {
+        
+        if( timer.getPeriod() <= 2 ) {
+            return 7;
+        }
                 
         return sequencer.getOutput();
     }

@@ -30,12 +30,12 @@ public final class TriangleRegisters {
     public void writeReg3(int M) {
         //$400A
         triangle.timer.setLow8PeriodBits(M);
-
     }
     
     public void writeReg4(int M) {
         //$400B
         triangle.timer.setUpper3PeriodBits(M);
+        
         triangle.lengthCounter.reload(M);
         triangle.linearCounter.reload(M);
         triangle.linearCounter.halt = true;

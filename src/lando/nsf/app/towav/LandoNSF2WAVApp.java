@@ -42,8 +42,8 @@ public final class LandoNSF2WAVApp {
     @Option(name="-maxSilenceSecs", required=false, usage="Tracks stops after silence")
     private int maxSilenceSecs=3;
     
-    @Option(name="-outFmt", required=false, usage="system_raw(21.47727mhz, 32bit float, raw apu output), wav_16_441(44.1khz, signed 16bit pcm wav file)")
-    private OutputFmt outFmt = OutputFmt.wav_16_441;
+    @Option(name="-outFmt", required=false, usage="system_raw(21.47727mhz, 32bit float, raw apu output), wav(44.1khz, signed 16bit pcm wav file)")
+    private OutputFmt outFmt = OutputFmt.wav;
     
     @Option(name="-splitChannels")
     private boolean splitChannels = false;

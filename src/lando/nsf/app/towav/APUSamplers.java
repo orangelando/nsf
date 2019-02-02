@@ -78,7 +78,7 @@ final class APUSamplers implements AutoCloseable {
         
         switch(outFmt) {
         case system_raw: return new RawConsumer(1, bout);
-        case wav_16_441: return new WavConsumer(bout, disableBandPass);
+        case wav: return new WavConsumer(bout, disableBandPass);
         }
         
         throw new IllegalArgumentException("Unknown fmt " + outFmt);
