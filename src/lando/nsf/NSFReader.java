@@ -1,7 +1,5 @@
 package lando.nsf;
 
-import static lando.nsf.HexUtils.toHex16;
-
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
@@ -51,26 +49,7 @@ public final class NSFReader {
 		
 		return new NSF(header, bytes);
 	}
-	
-    public static void load(NSF nsf, NESMem mem) {
-		Validate.notNull(nsf);
-		Validate.notNull(mem);
 		
-		if( nsf.isBanked() ) {
-			throw new IllegalArgumentException("Banked NSFs not handled yet.");
-		} else {
-			System.err.println("Straight loading... " + 0x80 );
-			
-			if( nsf.header.loadDataAddr < 0x8000 ) {
-				System.err.println("Warning: load data before $8000 vs " + toHex16(nsf.header.loadDataAddr));
-			}
-			
-			for(int i = 0x80; i < nsf.data.length; i++) {
-				mem.bytes[nsf.header.loadDataAddr + i - 0x80] = nsf.data[i];
-			}
-		}
-	}
-	
 	private static boolean equals(byte [] a, int aIndex, byte [] b, int bIndex, int len) {
 		
 		Validate.notNull(a);
