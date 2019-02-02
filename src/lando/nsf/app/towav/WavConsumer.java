@@ -19,6 +19,7 @@ final class WavConsumer implements APUSampleConsumer {
     private static final int WAV_SAMPLES_PER_SEC = 44_100;
     
     private final OutputStream bout;
+    private final boolean disableBandPass;
     private final Divider divider = new Divider(
             NSFRenderer.SYSTEM_CYCLES_PER_SEC/WAV_SAMPLES_PER_SEC);
     
@@ -27,8 +28,9 @@ final class WavConsumer implements APUSampleConsumer {
     private float[] filter;
     private SampleRingBuffer samples;
     
-    WavConsumer(OutputStream bout) {
+    WavConsumer(OutputStream bout, boolean disableBandPass) {
         this.bout = bout;
+        this.disableBandPass = disableBandPass;
     }
     
     @Override
@@ -49,25 +51,35 @@ final class WavConsumer implements APUSampleConsumer {
         accumulator += sample;
         
         if( divider.clock() ) {
-            accumulator /= divider.getPeriod();
+            accumulator = clamped(accumulator/divider.getPeriod());
             
-            if( accumulator > 1 ) {
-                accumulator = 1;
+            //I don't multiply by the full 65536/32767 range to give
+            //a bit of head room. Playing back files that went the
+            //full range was causes anything else playing on my machine
+            //to mute.
+            if( ! disableBandPass ) {
+                //the DC offset caused by the [0, 1] range is "reset"
+                //to the [-1, 1] range by the sinc filters.
+                shorts.append( (short)(filtered(accumulator)*32000) );
+            } else {
+                //raw APU output is [0, 1]
+                shorts.append( (short)(accumulator*64000 - 32000) );
             }
-            
-            else if( accumulator < 0 ) {
-                accumulator = 0;
-            }
-            
-            samples.add(accumulator);
-            
-            shorts.append( (short)(filtered()*32767) );
             
             accumulator = 0;
         }
     }
     
-    private float filtered() {
+    private float clamped(float sample) {
+        if( sample < 0f ) return 0f;
+        if( sample > 1f ) return 1f;
+        
+        return sample;
+    }
+    
+    private float filtered(float sample) {
+        
+        samples.add(sample);
        
         float a = 0;
         

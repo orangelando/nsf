@@ -84,6 +84,16 @@ public final class NES {
         loader.initTune(cpu, songIndex);
     }
     
+    public void execInit() {
+        startInit();
+        runRoutine();
+    }
+    
+    public void execPlay() {
+        startPlay();
+        runRoutine();
+    }
+    
     public void startInit() {
         loader.startInit(cpu, stopAddr);
     }

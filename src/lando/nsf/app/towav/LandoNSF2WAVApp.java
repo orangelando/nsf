@@ -48,6 +48,9 @@ public final class LandoNSF2WAVApp {
     @Option(name="-splitChannels")
     private boolean splitChannels = false;
     
+    @Option(name="-disableBandPass", required=false, usage="Disable the 440hz highpass and 14.4khz lowpass filter on wav output.")
+    private boolean disableBandPass = false;
+    
     public static void main(String [] args) throws Exception {
         
         LandoNSF2WAVApp app = new LandoNSF2WAVApp();
@@ -98,6 +101,10 @@ public final class LandoNSF2WAVApp {
         if( splitChannels ) {
             out.println("splitting channels");
             renderer.splitChannels();
+        }
+        
+        if( disableBandPass ) {
+            renderer.disableBandPass();
         }
         
         out.println("tracks-to-render: " + tracksToRender.size());

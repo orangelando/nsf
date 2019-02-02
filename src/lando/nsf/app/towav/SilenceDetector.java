@@ -24,6 +24,8 @@ final class SilenceDetector {
         if( divider.clock() ) {
             float avgDiffSq = sumDiffSq/divider.getPeriod();
             
+            //this magic number was arrived at
+            //through trial and error
             if( avgDiffSq < 1e-9f ) {
                 silenceDetected = true;
             }
