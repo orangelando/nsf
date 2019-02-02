@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
@@ -21,6 +23,9 @@ public final class NSFRenderer {
     //both the NES CPU and APU timers run off the
     //system clock divded by 12 or ~1.79MHz
     private final Divider cpuDivider = new Divider(12);
+    
+    //~239.996hz
+    private final Divider frameSequencerDivider = new Divider(89490);
         
     private final NES nes;
     private final OutputFmt outFmt;
@@ -32,6 +37,7 @@ public final class NSFRenderer {
     private final PeriodTimestampFinder playPeriodFinder;
     private final SilenceDetector silenceDetector;
     
+    private boolean splitChannels = false;
     private long systemCycle;
     private long nextCycleToPlay;
     
@@ -53,13 +59,20 @@ public final class NSFRenderer {
         this.silenceDetector = new SilenceDetector(SYSTEM_CYCLES_PER_SEC*maxSilenceSecs);
         this.playPeriodFinder = createPlayPeriodFinder();
     }
+    
+    public void splitChannels() {
+        splitChannels = true;
+    }
 
     public void render(int trackNum, Path outputPath) throws Exception {
         Validate.isTrue(trackNum >= 1 && trackNum <= nes.nsf.header.totalSongs);
         Validate.notNull(outputPath);
         
-        try(OutputStream os = Files.newOutputStream(outputPath);
-            BufferedOutputStream bout = new BufferedOutputStream(os)) {
+        List<OutputStream> streams = new ArrayList<>();
+        List<APUSamplePipe> samplers = new ArrayList<>();
+        
+        try {
+            setupSamplers(outputPath, streams, samplers);
             
             nes.initTune(trackNum - 1);
             
@@ -70,20 +83,111 @@ public final class NSFRenderer {
             cpuDivider.reset();
             silenceDetector.reset();
             nextCycleToPlay = playPeriodFinder.findNextPeriod(0);
-
-            APUSampleConsumer sc = createSampleConsumer(bout);
             
-            sc.init();
+            for(APUSamplePipe sampler: samplers) {
+                sampler.sampleConsumer.init();
+            }
             
             while(systemCycle < maxSystemCycles) {                
-                systemCycle += step(sc);
+                systemCycle += step(samplers);
                 
                 if( silenceDetector.wasSilenceDetected() ) {
                     break;
                 }
             }
             
-            sc.finish();
+            for(APUSamplePipe sampler: samplers) {
+                sampler.sampleConsumer.finish();
+            }
+                
+        } finally {
+            closeAll(streams);
+        }        
+    }
+    
+    private void addSampler(
+            Path outputPath,
+            APUSampleSupplier supplier,
+            List<OutputStream> streamsToClose, 
+            List<APUSamplePipe> samplers) throws Exception {
+        
+        out.println("    opening " + outputPath);
+        
+        OutputStream os = Files.newOutputStream(outputPath);
+        BufferedOutputStream bout = new BufferedOutputStream(os);
+        APUSampleConsumer consumer = createSampleConsumer(bout);
+
+        samplers.add(new APUSamplePipe(supplier, consumer));
+    }
+    
+    private void setupSamplers(Path outputPath, List<OutputStream> streams, List<APUSamplePipe> samplers) throws Exception {
+        
+        if( ! splitChannels ) {
+            addSampler(
+                    outputPath, 
+                    nes.apu::mixerOutput, 
+                    streams, 
+                    samplers);
+        } else {
+            ChannelNameAdder nameAdder = new ChannelNameAdder();
+            
+            if( nes.apu.isPulse1Enabled() ) {
+                addSampler(
+                        nameAdder.addChannelName(outputPath, "p1"),
+                        nes.apu::pulse1Output,
+                        streams,
+                        samplers);
+            }
+            
+            if( nes.apu.isPulse2Enabled() ) {
+                addSampler(
+                        nameAdder.addChannelName(outputPath, "p2"),
+                        nes.apu::pulse2Output,
+                        streams,
+                        samplers);
+            }
+            
+            if( nes.apu.isTriangleEnabled() ) {
+                addSampler(
+                        nameAdder.addChannelName(outputPath, "tri"),
+                        nes.apu::triangleOutput,
+                        streams,
+                        samplers);
+            }
+            
+            if( nes.apu.isNoiseEnabled() ) {
+                addSampler(
+                        nameAdder.addChannelName(outputPath, "noise"),
+                        nes.apu::noiseOutput,
+                        streams,
+                        samplers);
+            }
+            
+            if( nes.apu.isDmcEnabled() ) {
+                addSampler(
+                        nameAdder.addChannelName(outputPath, "dmc"),
+                        nes.apu::dmcOutput,
+                        streams,
+                        samplers);
+            }
+        }
+    }
+    
+    private void closeAll( List<OutputStream> streamsToClose) throws Exception {
+        Exception lastException = null;
+        
+        for(int i = streamsToClose.size() - 1; i >= 0; i--) {
+            OutputStream s = streamsToClose.get(i);
+            
+            try {
+                s.close();
+            } catch(Exception e) {
+                lastException = e;
+            }
+        }
+        
+        if( lastException != null ) {
+            throw lastException;
         }
     }
     
@@ -113,7 +217,7 @@ public final class NSFRenderer {
     /*
      * returns number of cycles that elapsed.
      */
-    private int step(APUSampleConsumer sampleConsumer) throws Exception {
+    private int step(List<APUSamplePipe> samplers) throws Exception {
         int cycles;
         
         if( systemCycle >= nextCycleToPlay ) {
@@ -133,20 +237,28 @@ public final class NSFRenderer {
                 nes.apu.clockChannelTimers();
             }
             
-            nes.apu.clockFrameSequencer();
-            
-            float sample = nes.apu.getOutput();
-
-            silenceDetector.addSample(sample);
-            
-            if( ! disableFadeOut && systemCycle >= fadeOutStartCycle ) {
-                float scale = 1f - (float)(systemCycle - fadeOutStartCycle)/(maxSystemCycles - fadeOutStartCycle);
-                sample *= scale;
+            if( frameSequencerDivider.clock() ) {
+                nes.apu.clockFrameSequencer();
             }
             
-            sampleConsumer.consume(sample);
+            float sample = nes.apu.mixerOutput();
+
+            silenceDetector.addSample(sample);
+
+            float scale;
+            
+            if( ! disableFadeOut && systemCycle >= fadeOutStartCycle ) {
+                scale = 1f - (float)(systemCycle - fadeOutStartCycle)/(maxSystemCycles - fadeOutStartCycle);
+            } else {
+                scale = 1f;
+            }
+            
+            for(APUSamplePipe sampler: samplers) {
+                sampler.sample(scale);
+            }
         }
         
         return cycles;
     }
+
 }

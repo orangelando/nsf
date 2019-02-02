@@ -45,6 +45,9 @@ public final class LandoNSF2WAVApp {
     @Option(name="-outFmt", required=false, usage="system_raw(21.47727mhz, 32bit float, raw apu output), wav_16_441(44.1khz, signed 16bit pcm wav file)")
     private OutputFmt outFmt = OutputFmt.wav_16_441;
     
+    @Option(name="-splitChannels")
+    private boolean splitChannels = false;
+    
     public static void main(String [] args) throws Exception {
         
         LandoNSF2WAVApp app = new LandoNSF2WAVApp();
@@ -91,6 +94,11 @@ public final class LandoNSF2WAVApp {
         }
         
         NSFRenderer renderer = new NSFRenderer(nes, outFmt, maxPlaySecs, maxSilenceSecs);
+        
+        if( splitChannels ) {
+            out.println("splitting channels");
+            renderer.splitChannels();
+        }
         
         out.println("tracks-to-render: " + tracksToRender.size());
         
