@@ -73,4 +73,8 @@ public final class LengthCounter {
     public boolean isDisabled() {
         return disabled;
     }
+    
+    public boolean shouldSilenceChannel() {
+        return ! disabled && count == 0;
+    }
 }

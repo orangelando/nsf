@@ -6,8 +6,8 @@ import lando.nsf.apu.LengthCounter;
 import lando.nsf.apu.Timer;
 
 public final class PulseChannel {
-    
 
+    public final boolean isSecondChannel;
     public final LengthCounter lengthCounter = new LengthCounter();
     public final EnvelopeGenerator envelopeGenerator = new EnvelopeGenerator();
     public final PulseSequencer sequencer = new PulseSequencer();
@@ -18,6 +18,7 @@ public final class PulseChannel {
     
     public PulseChannel(boolean isSecondChannel) {
         this.sweep = new SweepUnit(timer, isSecondChannel);
+        this.isSecondChannel = isSecondChannel;
     }
     
     public void clockTimer() {
@@ -31,28 +32,18 @@ public final class PulseChannel {
     
     public int getOutput() {
         
-        /*
-        System.err.println(
-                "timer: " + timer.getCount() + ", " + timer.getPeriod() + ", " +
-                "sweep: " + sweep.getShifter() + ", " + sweep.isTooMuch() + ", " + 
-                "sequencer: " + sequencer.getOutput() + ", " + 
-                "lengthCounter: " + lengthCounter.getCount() + ", " + lengthCounter.isDisabled() + ", " + 
-                "envelopeGenerator: " + envelopeGenerator.getVolume());
-                */
-              
-        
         if( sweep.isTooMuch() ) {
+            return 0;
+        }
+        
+        if( lengthCounter.shouldSilenceChannel() ) {
             return 0;
         }
         
         if( sequencer.getOutput() == 0 ) {
             return 0;
         }
-        
-        if( ! lengthCounter.isDisabled() && lengthCounter.getCount() == 0 ) {
-            return 0;
-        }
-              
+                      
         return envelopeGenerator.getVolume();
     }
 }

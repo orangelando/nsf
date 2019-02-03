@@ -77,7 +77,7 @@ final class APUSamplers implements AutoCloseable {
     private APUSampleConsumer createSampleConsumer(BufferedOutputStream bout) {
         
         switch(outFmt) {
-        case system_raw: return new RawConsumer(1, bout);
+        case system_raw: return new RawConsumer(12, bout);
         case wav: return new WavConsumer(bout, disableBandPass);
         }
         

@@ -43,7 +43,7 @@ public final class SweepUnit {
     }
     
     int getShifter() {
-        int shifter = timer.getPeriod()>>shift;
+        int shifter = timer.getPeriod()>>>shift;
         
         if( negate ) {
             shifter = ~shifter + (isForSecondPulse ? 1 : 0);
@@ -57,6 +57,6 @@ public final class SweepUnit {
     }
     
     boolean isTooMuch(int shifter) {
-        return timer.getPeriod() < 8 || shifter > 0x7FF;
+        return timer.getPeriod() < 8 || (shifter&0xFF_FF) > 0x7FF;
     }
 }
