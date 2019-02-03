@@ -15,7 +15,7 @@ import java.time.Duration;
 import org.apache.commons.lang3.Validate;
 
 import lando.dsp.SimpleDsp;
-import lando.nsf.app.towav.SampleRingBuffer;
+import lando.nsf.app.towav.FilteredSampleBuffer;
 
 public class FixedPointTestApp {
 
@@ -83,7 +83,7 @@ public class FixedPointTestApp {
         float[] filter = dsp.convolve(highpass, lowpass);
         
         //float[] filter = dsp.createLowPass(samplesPerSec,  14_000, 36_000);
-        SampleRingBuffer buf = new SampleRingBuffer(filter);
+        FilteredSampleBuffer buf = new FilteredSampleBuffer(filter);
         
         System.err.println("filter: " + filter.length);
         

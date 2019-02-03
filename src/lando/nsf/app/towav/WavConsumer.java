@@ -9,6 +9,8 @@ import lando.wav.WAVWriter;
 
 /**
  * Outputs a single channel of signed 16-bit PCM samples at 44.1khz
+ * by sampling the moving average of the APU output. 
+ * The moving average of the APU output is a crude highpass.
  * 
  * Tries to apply similar filtering that the APU mixer circuit + downstream
  * circuitry applies.
@@ -23,10 +25,10 @@ final class WavConsumer implements APUSampleConsumer {
     private final Divider divider = new Divider(
             NSFRenderer.SYSTEM_CYCLES_PER_SEC/WAV_SAMPLES_PER_SEC);
     
-    private float accumulator = 0;
     private ShortArray shorts = new ShortArray();
     private float[] filter;
-    private SampleRingBuffer samples;
+    private FilteredSampleBuffer samples;
+    private TotalingSampleBuffer movingAverage;
     
     WavConsumer(OutputStream bout, boolean disableBandPass) {
         this.bout = bout;
@@ -41,32 +43,32 @@ final class WavConsumer implements APUSampleConsumer {
         float[] lowpass  = dsp.createLowPass (WAV_SAMPLES_PER_SEC, 14_000, 26_000);
         
         filter = dsp.convolve(highpass, lowpass);
-                
-        samples = new SampleRingBuffer(filter);
+        samples = new FilteredSampleBuffer(filter);
+        movingAverage = new TotalingSampleBuffer(divider.getPeriod());
     }
 
     @Override
     public void consume(float sample) throws Exception {
         
-        accumulator += sample;
+        movingAverage.add(sample);
         
         if( divider.clock() ) {
-            accumulator = clamped(accumulator/divider.getPeriod());
-            
-            //I don't multiply by the full 65536/32767 range to give
-            //a bit of head room. Playing back files that went the
-            //full range was causes anything else playing on my machine
-            //to mute.
-            if( ! disableBandPass ) {
-                //the DC offset caused by the [0, 1] range is "reset"
-                //to the [-1, 1] range by the sinc filters.
-                shorts.append( (short)(filtered(accumulator)*32000) );
-            } else {
-                //raw APU output is [0, 1]
-                shorts.append( (short)(accumulator*64000 - 32000) );
-            }
-            
-            accumulator = 0;
+            emit(clamped(movingAverage.computeAverage()));
+        }
+    }
+    
+    private void emit(float sample) throws Exception {
+        //I don't multiply by the full 65536/32767 range to give
+        //a bit of head room. Playing back files that went the
+        //full range was causes anything else playing on my machine
+        //to mute.
+        if( ! disableBandPass ) {
+            //the DC offset caused by the [0, 1] range is "reset"
+            //to the [-1, 1] range by the sinc filters.
+            shorts.append( (short)(filtered(sample)*32000) );
+        } else {
+            //raw APU output is [0, 1]
+            shorts.append( (short)(sample*64000 - 32000) );
         }
     }
     

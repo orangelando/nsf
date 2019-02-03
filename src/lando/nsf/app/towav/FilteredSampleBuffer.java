@@ -2,17 +2,14 @@ package lando.nsf.app.towav;
 
 import org.apache.commons.lang3.Validate;
 
-/**
- * FIFO buffer of samples.
- */
-public final class SampleRingBuffer {
+public final class FilteredSampleBuffer {
 
     public final float[] samples;
     private final float[] filter;
     
     public int next;
     
-    public SampleRingBuffer(float[] filter) {
+    public FilteredSampleBuffer(float[] filter) {
         Validate.isTrue( filter != null && filter.length > 0);
         this.samples = new float[filter.length];
         this.filter = filter;
