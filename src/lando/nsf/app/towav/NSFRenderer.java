@@ -65,7 +65,6 @@ public final class NSFRenderer {
         disableBandPass = true;
     }
 
-
     public void render(int trackNum, Path outputPath) throws Exception {
         Validate.isTrue(trackNum >= 1 && trackNum <= nes.nsf.header.totalSongs);
         Validate.notNull(outputPath);
@@ -112,10 +111,7 @@ public final class NSFRenderer {
         
         return new PeriodTimestampFinder(0, playPeriodSystemCycles);
     }
-
-    /*
-     * returns number of cycles that elapsed.
-     */
+    
     private int step(List<APUSamplePipe> samplers) throws Exception {
         int cycles;
         
@@ -140,7 +136,7 @@ public final class NSFRenderer {
             }
             
             float sample = nes.apu.mixerOutput();
-
+            
             silenceDetector.addSample(sample);
 
             float scale;

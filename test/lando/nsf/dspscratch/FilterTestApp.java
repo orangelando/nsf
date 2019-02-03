@@ -56,7 +56,7 @@ public class FilterTestApp {
         //float[] filter = dsp.convolve(highpass, lowpass);
         
         float[] filter = dsp.createLowPass(samplesPerSec,  14_000, 36_000);
-        SampleRingBuffer buf = new SampleRingBuffer(filter.length);
+        SampleRingBuffer buf = new SampleRingBuffer(filter);
         
         System.err.println("filter: " + filter.length);
         

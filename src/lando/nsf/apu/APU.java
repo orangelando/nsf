@@ -20,10 +20,10 @@ public final class APU {
 	private boolean triangleEnabled = true;
 	private boolean noiseEnabled = true;
 	private boolean dmcEnabled = true;
-		
+			
 	public APU(CPU cpu) {
 	    this.frameSequencer = new FrameSequencer(
-	            cpu, pulse1, pulse2, triangle, noise, dmc);
+	            cpu, pulse1, pulse2, triangle, noise, dmc);	    
 	}
 	
 	public void setPulse1Enabled(boolean flag) {
@@ -96,7 +96,7 @@ public final class APU {
     public float dmcOutput() {
         return clamped(dmc.getOutput()/128f);
     }
-	
+    	
 	/**
 	 * returns a value in the range [0, 1]
 	 */

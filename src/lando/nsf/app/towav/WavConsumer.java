@@ -42,7 +42,7 @@ final class WavConsumer implements APUSampleConsumer {
         
         filter = dsp.convolve(highpass, lowpass);
                 
-        samples = new SampleRingBuffer(filter.length);
+        samples = new SampleRingBuffer(filter);
     }
 
     @Override
@@ -78,16 +78,9 @@ final class WavConsumer implements APUSampleConsumer {
     }
     
     private float filtered(float sample) {
-        
         samples.add(sample);
-       
-        float a = 0;
         
-        for(int i = 0; i < filter.length; i++) {
-            a += filter[filter.length - 1 - i]*samples.samples[(samples.next + i)%filter.length];
-        }
-        
-        return a;
+        return samples.filtered();
     }
 
     @Override

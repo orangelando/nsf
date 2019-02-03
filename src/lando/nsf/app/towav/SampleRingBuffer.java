@@ -8,11 +8,14 @@ import org.apache.commons.lang3.Validate;
 public final class SampleRingBuffer {
 
     public final float[] samples;
+    private final float[] filter;
+    
     public int next;
     
-    public SampleRingBuffer(int size) {
-        Validate.isTrue(size > 0);
-        this.samples = new float[size];
+    public SampleRingBuffer(float[] filter) {
+        Validate.isTrue( filter != null && filter.length > 0);
+        this.samples = new float[filter.length];
+        this.filter = filter;
         this.next = 0;
     }
     
@@ -26,5 +29,15 @@ public final class SampleRingBuffer {
         if( next == samples.length ) {
             next = 0;
         }
+    }
+    
+    public float filtered() {
+        float a = 0;
+        
+        for(int i = 0; i < filter.length; i++) {
+            a += filter[filter.length - 1 - i]*samples[(next + i)%filter.length];
+        }
+        
+        return a;
     }
 }
