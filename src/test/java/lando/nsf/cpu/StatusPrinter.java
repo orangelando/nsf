@@ -1,8 +1,8 @@
 package lando.nsf.cpu;
 
-import static lando.nsf.cpu.StringUtils.toBin8;
-import static lando.nsf.cpu.StringUtils.toHex2;
-import static lando.nsf.cpu.StringUtils.toHex4;
+import static lando.nsf.gui.StringUtils.toBin8;
+import static lando.nsf.gui.StringUtils.toHex2;
+import static lando.nsf.gui.StringUtils.toHex4;
 
 import java.io.PrintStream;
 

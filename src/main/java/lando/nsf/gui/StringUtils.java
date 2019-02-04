@@ -1,4 +1,4 @@
-package lando.nsf.cpu;
+package lando.nsf.gui;
 
 public final class StringUtils {
 

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import lando.nsf.app.towav.NES;
 import lando.nsf.app.towav.PeriodTimestampFinder;
 import lando.nsf.cpu.Memory;
-import lando.nsf.cpu.StringUtils;
+import lando.nsf.gui.StringUtils;
 
 public class TestPlaybackWithSchedulerApp {
     
