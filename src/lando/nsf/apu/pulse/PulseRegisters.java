@@ -2,8 +2,6 @@ package lando.nsf.apu.pulse;
 
 import java.util.Objects;
 
-import lando.nsf.cpu.StringUtils;
-
 public final class PulseRegisters {
     
     private static final int LENGTH_ENABLE_BIT = 0x20;
@@ -21,12 +19,6 @@ public final class PulseRegisters {
     }
     
     public void writeReg1(int M) {
-        
-        if( pulse.isSecondChannel ) {
-            //String s = StringUtils.toBin8(M);
-            //System.err.printf("reg1 %s%n", s.substring(0, 4) + " " + s.substring(4));
-        }
-        
         //$4000,$4004
         pulse.sequencer.setDuty(M >> 6);
         
@@ -53,11 +45,10 @@ public final class PulseRegisters {
     }
     
     public void writeReg4(int M) {
-        
         //$4003,$4007
         pulse.lengthCounter.reload(M);
         pulse.envelopeGenerator.restartOnNextClock();
         pulse.timer.setUpper3PeriodBits(M);
-        pulse.sequencer.setDuty(0);
+        pulse.sequencer.reset();
     }
 }

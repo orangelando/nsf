@@ -24,7 +24,7 @@ public final class TestInitRoutineApp {
     public static void main(String [] args) throws Exception {
         
         Path path = Paths.get(
-                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf");
+                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/c/Castlevania [Akumajou Dracula] (1987)(Konami).nsf");
         
         MonitoringMem monitoringMem = new MonitoringMem();
         NES nes = NES.buildForPath(path, (mem) -> {
@@ -58,7 +58,7 @@ public final class TestInitRoutineApp {
                 NESMem.FIRST_BANK_SWITCH_REGISTER, 16, 16, nes.cpu, monitoringMem);
         
         MemoryMonitor apuRegsPage = new MemoryMonitor(
-                0x4000, 32, 16, nes.cpu, monitoringMem);
+                0x4000, 32, 4, nes.cpu, monitoringMem);
 
         TextLines dissassemblerTxt = new TextLines(dissassembler::currStatus);
         

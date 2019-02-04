@@ -1,11 +1,13 @@
 package lando.nsf.apu;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import lando.nsf.apu.dmc.DeltaModulationRegisters;
 import lando.nsf.apu.noise.NoiseRegisters;
 import lando.nsf.apu.pulse.PulseRegisters;
 import lando.nsf.apu.triangle.TriangleRegisters;
+import lando.nsf.cpu.StringUtils;
 
 public final class APURegisters {
     
@@ -61,6 +63,17 @@ public final class APURegisters {
     }
     
     public void write(int addr, int M) {
+        
+        /*
+        if( addr == STATUS_ADDR ) 
+            logWrite("S", addr, M);
+        
+        if( addr == FRAME_COUNTER_ADDR ) 
+            logWrite("F", addr, M);
+        
+        if( addr >= PULSE_2_STATUS_ADDR && addr <= PULSE_2_LEN_TIMER_ADDR )
+            logWrite(addr - PULSE_2_STATUS_ADDR, addr, M);
+        */
         
         switch(addr) {
         
@@ -120,6 +133,34 @@ public final class APURegisters {
         
         return status;
     }
+    
+    /*
+    private void logWrite(String l, int A, int M) {
+        
+        String s = StringUtils.toBin8(M);
+        s = s.substring(0, 4) + " " + s.substring(4);
+        
+        String w = "";
+        
+        System.out.printf("%s: %s[%s]%s%n", StringUtils.toHex4(A), w, l, s);
+    }
+    
+    private void logWrite(int regNum, int A, int M) {
+       
+        ++regNum; 
+        
+        String s = StringUtils.toBin8(M);
+        s = s.substring(0, 4) + " " + s.substring(4);
+        
+        String w = "";
+        
+        for(int i = 1; i <= regNum; i++) {
+            w += "               ";
+        }
+        
+        System.out.printf("%s: %s[%d]%s%n", StringUtils.toHex4(A), w, regNum, s);
+    }
+    */
 
     private void writeStatusReg(int M) {
         
@@ -138,6 +179,7 @@ public final class APURegisters {
     }
         
     private void writeFrameCounterReg(int M) {
+        
         //reset divider and sequencer
         //mi-- ---- mode, IRQ disable
         boolean mode       = ((M>>7)&1) != 0;

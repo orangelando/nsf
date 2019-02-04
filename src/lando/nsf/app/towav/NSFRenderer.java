@@ -118,6 +118,10 @@ public final class NSFRenderer {
         if( systemCycle >= nextCycleToPlay ) {
             nextCycleToPlay = playPeriodFinder.findNextPeriod(systemCycle + 1);
             
+            //System.out.println("___________________________________________________________________________________");
+            //System.out.printf("t:%.3f%n", (double)systemCycle/SYSTEM_CYCLES_PER_SEC);
+            //System.out.println();
+            
             nes.execPlay();
             
             cycles = nes.numCycles.get();                
