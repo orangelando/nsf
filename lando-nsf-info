@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Crappy hack script to launch main program.
+#
+
+if [[ -z $JAVA_HOME ]]
+then
+    JAVA_CMD=$(which java)
+else
+    JAVA_CMD=${JAVA_HOME}/java
+fi
+
+if [[ ! -e $JAVA_CMD ]]
+then
+    echo "java-cmd '$JAVA_CMD' does not exists."
+    exit 1
+fi
+
+MAIN_CLASS=lando.nsf.app.info.LandoNSFInfoApp
+
+$JAVA_CMD -classpath target/nsf-*.jar $MAIN_CLASS $@
+

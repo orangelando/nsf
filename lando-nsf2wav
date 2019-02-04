@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# crappy hack script to launch main program.
+#
+
+if [[ -z $java_home ]]
+then
+    java_cmd=$(which java)
+else
+    java_cmd=${java_home}/java
+fi
+
+if [[ ! -e $java_cmd ]]
+then
+    echo "java-cmd '$java_cmd' does not exists."
+    exit 1
+fi
+
+main_class=lando.nsf.app.towav.LandoNSF2WAVApp
+
+$java_cmd -classpath target/nsf-*.jar $main_class $@
+
