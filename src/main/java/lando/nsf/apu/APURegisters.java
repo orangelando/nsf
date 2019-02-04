@@ -1,13 +1,11 @@
 package lando.nsf.apu;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import lando.nsf.apu.dmc.DeltaModulationRegisters;
 import lando.nsf.apu.noise.NoiseRegisters;
 import lando.nsf.apu.pulse.PulseRegisters;
 import lando.nsf.apu.triangle.TriangleRegisters;
-import lando.nsf.cpu.StringUtils;
 
 public final class APURegisters {
     

@@ -1,9 +1,5 @@
 package lando.nsf.dspscratch;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.ceil;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 import static lando.nsf.spectrogram.GenerateSpectrogramApp.readAllSamples;
 
 import java.io.BufferedOutputStream;

@@ -2,9 +2,7 @@ package lando.nsf.dspscratch;
 
 import static lando.nsf.spectrogram.GenerateSpectrogramApp.readAllSamples;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
