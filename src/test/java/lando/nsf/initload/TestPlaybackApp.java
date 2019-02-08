@@ -13,8 +13,7 @@ public final class TestPlaybackApp {
                 
         PrintStream out = System.err;
         
-        Path path = Paths.get(
-                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf");
+        Path path = Paths.get(args[0]);
         
         NES nes = NES.buildForPathNoMemMonitor(path);
         

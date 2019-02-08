@@ -19,12 +19,11 @@ public class TestPlaybackWithSchedulerApp {
     
     public static void main(String [] args) throws Exception {
         
-        PrintStream out = System.err;
+        PrintStream out = System.out;
         
-        Path path = Paths.get(
-                //"/Users/oroman/Desktop/stuff2/NSF-06-01-2011/d/Donkey Kong (1983)(Ikegami Tsushinki)(Nintendo R&D1)(Nintendo).nsf"
-                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/s/Super Mario Bros. 2 [Yume Koujou - Doki Doki Panic] [Super Mario USA] (1987)(Nintendo EAD)(Nintendo).nsf"
-                );
+        Path path = Paths.get(args[0]);
+        int songIndex = Integer.parseInt(args[1]) - 1;
+        int playSecs = Integer.parseInt(args[2]);
         
         APUCaptureMem apuMem = new APUCaptureMem();
         NES nes = NES.buildForPath(path, (mem) -> {
@@ -34,7 +33,6 @@ public class TestPlaybackWithSchedulerApp {
         
         out.println("num-songs: " + nes.nsf.header.totalSongs);
         
-        int songIndex = 5;
         nes.initTune(songIndex);
         
         apuMem.startCapturing(System.nanoTime());
@@ -71,13 +69,14 @@ public class TestPlaybackWithSchedulerApp {
         scheduler.scheduleAtFixedRate(
                 () -> {
                     maybeExecPlayRoutine(
+                            playStart, 
                             periodFinder, schedPeriodNanos, statsList, nes, apuMem);      
                 }, 
                 0, 
                 schedPeriodNanos, 
                 TimeUnit.NANOSECONDS);
         
-        while( ! scheduler.awaitTermination(10, TimeUnit.SECONDS)) {
+        while( ! scheduler.awaitTermination(playSecs, TimeUnit.SECONDS)) {
             scheduler.shutdownNow();
         }
         
@@ -93,6 +92,7 @@ public class TestPlaybackWithSchedulerApp {
     }
 
     private static void maybeExecPlayRoutine(
+            long initStart, 
             PeriodTimestampFinder periodFinder,
             long schedPeriodNanos,
             PlayStatsList statsList,
@@ -116,6 +116,8 @@ public class TestPlaybackWithSchedulerApp {
         }
             
         long startPlay = System.nanoTime();
+        //System.out.println("_____________________________________________________________________");
+        //System.out.printf("t:%.3f%n", (startPlay - initStart)/1e9);
         //apuMem.startCapturing(startPlay);
         nes.startPlay();
         nes.runRoutine();
@@ -168,9 +170,11 @@ public class TestPlaybackWithSchedulerApp {
             out.printf("%.3f%n", time/1e9);
             
             for(Write write: writes.writes) {
-                out.printf("    %4x: %s%n", 
-                        write.addr, 
-                        StringUtils.toBin8(write.data));
+                String d = StringUtils.toBin8(write.data);
+                
+                d = d.substring(0, 4) + " " + d.substring(4);
+                
+                out.printf("    %4x: %8s%n", write.addr, d);
             }
         }
     }

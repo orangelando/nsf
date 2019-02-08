@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -23,8 +24,8 @@ public final class TestInitRoutineApp {
 
     public static void main(String [] args) throws Exception {
         
-        Path path = Paths.get(
-                "/Users/oroman/Desktop/stuff2/NSF-06-01-2011/c/Castlevania [Akumajou Dracula] (1987)(Konami).nsf");
+        Path path = Paths.get(args[0]);
+        int songIndex = Integer.parseInt(args[1]) - 1;
         
         MonitoringMem monitoringMem = new MonitoringMem();
         NES nes = NES.buildForPath(path, (mem) -> {
@@ -33,11 +34,8 @@ public final class TestInitRoutineApp {
             return monitoringMem;
         });
         
-        int songIndex = 1;
-        
         nes.initTune(songIndex);
         
-         
         nes.startInit();
         RunState runState = RunState.INIT;
         
@@ -59,6 +57,8 @@ public final class TestInitRoutineApp {
         
         MemoryMonitor apuRegsPage = new MemoryMonitor(
                 0x4000, 32, 4, nes.cpu, monitoringMem);
+        
+        apuRegsPage.printBinary();
 
         TextLines dissassemblerTxt = new TextLines(dissassembler::currStatus);
         
@@ -87,6 +87,21 @@ public final class TestInitRoutineApp {
         stackPageFrame.setSize(385, 385);
         bankRegsFrame.setSize(385, 385);
         apuRegsFrame.setSize(385, 385);
+        
+        Consumer<RunState> update = (rs) -> {
+            try {
+                dissassemblerFrame.setTitle("Dissassembler - " + rs);
+                dissassemblerTxt.updateTxt();
+                zeroPageTxt.updateTxt();
+                stackPageTxt.updateTxt();
+                bankRegsTxt.updateTxt();
+                apuRegsTxt.updateTxt();
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+        
+        update.accept(runState);
         
         while(dissassemblerFrame.isVisible()) {
             
@@ -127,12 +142,7 @@ public final class TestInitRoutineApp {
                     numInstrs.incrementAndGet();
                 }
                 
-                dissassemblerFrame.setTitle("Dissassembler - " + runState);
-                dissassemblerTxt.updateTxt();
-                zeroPageTxt.updateTxt();
-                stackPageTxt.updateTxt();
-                bankRegsTxt.updateTxt();
-                apuRegsTxt.updateTxt();
+                update.accept(runState);
             }
             
             Thread.sleep(10);
