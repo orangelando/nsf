@@ -28,6 +28,8 @@ public final class MemoryMonitor {
     private int[] prevBytes;
     private int[] currBytes;
     
+    private boolean printBinary = false;
+    
     public MemoryMonitor(int startAddr, int size, int numCols, CPU cpu, MonitoringMem mem) {
         Validate.isTrue(size > 0);
         Validate.isTrue(startAddr >= 0 && startAddr + size <= MAX_SIZE);
@@ -41,6 +43,10 @@ public final class MemoryMonitor {
         
         this.cpu = Objects.requireNonNull(cpu);
         this.mem = Objects.requireNonNull(mem);
+    }
+    
+    public void printBinary() {
+        printBinary = true;
     }
     
     public List<TextLine> memData() {
@@ -69,7 +75,13 @@ public final class MemoryMonitor {
                 int data = currBytes[i];
                 int start = txt.length();
                 
-                txt.append(HexUtils.toHex8(data));
+                if( ! printBinary ) {
+                    txt.append(HexUtils.toHex8(data));
+                } else {
+                    String b = StringUtils.toBin8(data);
+                    b = b.substring(0, 4) + "_" + b.substring(4);
+                    txt.append(b);
+                }
                 
                 int end = txt.length();
                 int highlightStatus = 0;
@@ -105,4 +117,5 @@ public final class MemoryMonitor {
             currBytes[i] = mem.readButDontMonitor(startAddr + i);
         }
     }
+
 }
