@@ -80,3 +80,10 @@ The full list of options are:
  * **-splitChannels** Output each channel into a separate file.
  * **-outFmt wav|system_raw** The system-raw option outputs to 32-bit, little endian float samples per 1.79MHz clock tick. Useful for debugging. Default is wav which outputs a standard wav file with mono 16bit PCM samples at 44.1kHz.
 
+## Resources
+
+ * [Nesdev Wiki](https://wiki.nesdev.com/w/index.php/Nesdev_Wiki) - The jumping point for all my research
+ * [Easy 6502](http://skilldrick.github.io/easy6502/) - My starting point for 6502 stuff.
+ * [Obelisk 6502 Reference](http://www.obelisk.me.uk/6502/reference.html)
+ * [NMOS 6502 Programming Manual](http://archive.6502.org/books/mcs6500_family_programming_manual.pdf)
+
