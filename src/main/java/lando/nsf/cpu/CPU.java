@@ -580,6 +580,42 @@ public final class CPU {
 	    setZN(A);
 	}
 	
+	//*
+    private void sbc(int M) {
+       
+        if( (P & STATUS_D) != 0 ) {
+            throw new IllegalStateException("Decimal flag not supported");
+        }
+        
+        //not sure why this all works
+        //this is from Easy 6502
+        boolean overflow = ((A^M) & 0x80) != 0;
+        setStatus( overflow, STATUS_O);
+        
+        int C = (P & STATUS_C) != 0 ? 1 : 0;
+        
+        int w = 0xFF + A - M + C;
+        
+        if( w < 0x100 ) {
+            setStatus(false, STATUS_C);
+            
+            if( overflow && w < 0x80 ) {
+                setStatus(false, STATUS_O);
+            }
+        } else {
+            setStatus(true, STATUS_C);
+            
+            if( overflow && w >= 0x180 ) {
+                setStatus(false, STATUS_O);
+            }
+        }
+        
+        A = w & 0xFF;
+        setZN(A);
+    }
+    //*/
+   
+	   /* my impl is incorrect, need a test to show me where!
 	private void sbc(int M) {
 	    
 		if( (P & STATUS_D) != 0 ) {
@@ -595,6 +631,7 @@ public final class CPU {
 	    setStatus( oldSign != newSign, STATUS_O);
 	    A &= 0xFF;
 	}
+	*/
 	
 	private void aslAcc() {
 		setStatus( (A & 0x80) != 0, STATUS_C );
