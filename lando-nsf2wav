@@ -18,5 +18,5 @@ fi
 
 main_class=lando.nsf.app.towav.LandoNSF2WAVApp
 
-$java_cmd -classpath target/nsf-*.jar $main_class $@
+$java_cmd -classpath target/nsf-*.jar $main_class "$@"
 
